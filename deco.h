@@ -1,0 +1,68 @@
+/* SPDX-License-Identifier: MIT-0 */
+
+#ifndef DECO_H
+#define DECO_H
+
+#include <stddef.h>
+
+#define max(X, Y) (((X) > (Y)) ? (X) : (Y))
+#define min(X, Y) (((X) < (Y)) ? (X) : (Y))
+#define len(X) (sizeof(X) / sizeof((X)[0]))
+
+#define P_WV_BUHL 0.0627 /* Buhlmann value, Rq = 1.0, least conservative */
+#define P_WV_NAVY 0.0567 /* US. Navy value, Rq = 0.9 */
+#define P_WV_SCHR 0.0493 /* Schreiner value, Rq = 0.8, most conservative */
+#define P_WV P_WV_BUHL
+
+#define SURFACE_PRESSURE 1.01325
+#define MOD_AUTO 0
+
+enum ALGO {
+    ZHL_16A = 0,
+    ZHL_16B = 1,
+    ZHL_16C = 2,
+};
+
+typedef struct decostate_t {
+    double pn2[16];
+    double phe[16];
+    unsigned char gflo;
+    unsigned char gfhi;
+    double firststop;
+    double max_depth;
+    double ceil_multiple;
+} decostate_t;
+
+typedef struct gas_t {
+    unsigned char o2;
+    unsigned char he;
+    unsigned char n2;
+    double mod;
+} gas_t;
+
+double bar_to_msw(const double bar);
+double msw_to_bar(const double msw);
+double abs_depth(const double gd);
+double gauge_depth(const double ad);
+
+gas_t gas_new(const unsigned char o2, const unsigned char he, double mod);
+int gas_equal(const gas_t *g1, const gas_t *g2);
+unsigned char gas_o2(const gas_t *gas);
+unsigned char gas_he(const gas_t *gas);
+unsigned char gas_n2(const gas_t *gas);
+double gas_mod(const gas_t *gas);
+
+double add_segment_ascdec(decostate_t *ds, const double dstart, const double dend, const double time,
+                          const gas_t *gas);
+double add_segment_const(decostate_t *ds, const double depth, const double time, const gas_t *gas);
+double get_gf(const decostate_t *ds, const double depth);
+double ceiling(const decostate_t *ds, double gf);
+double round_ceiling(const decostate_t *ds, const double c);
+
+void init_decostate(decostate_t *ds, const unsigned char gflo, const unsigned char gfhi, const double ceil_multiple);
+
+double ppO2(double depth, const gas_t *gas);
+double end(double depth, const gas_t *gas);
+double ead(double depth, const gas_t *gas);
+
+#endif /* end of include guard: DECO_H */
