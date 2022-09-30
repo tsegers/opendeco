@@ -241,6 +241,33 @@ double ceiling(const decostate_t *ds, double gf)
     return round_ceiling(ds, c);
 }
 
+double gf99(const decostate_t *ds, double depth)
+{
+    double gf = 0;
+
+    for (int i = 0; i < 16; i++) {
+        /* n2 a and b values */
+        double an = ZHL16N[i].a[ALGO_VER];
+        double bn = ZHL16N[i].b;
+
+        /* he a and b values */
+        double ah = ZHL16He[i].a;
+        double bh = ZHL16He[i].b;
+
+        /* scale n2 and he values for a and b proportional to their pressure */
+        double pn2 = ds->pn2[i];
+        double phe = ds->phe[i];
+
+        double a = ((an * pn2) + (ah * phe)) / (pn2 + phe);
+        double b = ((bn * pn2) + (bh * phe)) / (pn2 + phe);
+
+        /* update gf99 */
+        gf = max(gf, (pn2 + phe - depth) / (a + depth / b - depth));
+    }
+
+    return gf * 100;
+}
+
 void init_tissues(decostate_t *ds)
 {
     const double pn2 = 0.79 * (SURFACE_PRESSURE - P_WV);
