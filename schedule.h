@@ -26,7 +26,7 @@ typedef enum segtype_t {
     SEG_TRAVEL,
 } segtype_t;
 
-typedef void (*segment_callback_t)(const waypoint_t, const segtype_t);
+typedef void (*segment_callback_t)(const decostate_t *ds, const waypoint_t, const segtype_t);
 
 const gas_t *best_gas(const double depth, const gas_t *gasses, const int nof_gasses);
 const gas_t *next_gas(const double depth, const gas_t *gasses, const int nof_gasses);

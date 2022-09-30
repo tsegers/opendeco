@@ -69,7 +69,7 @@ void simulate_dive(decostate_t *ds, waypoint_t *waypoints, const int nof_waypoin
             runtime += add_segment_const(ds, d, t, g);
         }
 
-        seg_cb((waypoint_t){.depth = d, .time = t, .gas = g}, SEG_DIVE);
+        seg_cb(ds, (waypoint_t){.depth = d, .time = t, .gas = g}, SEG_DIVE);
     }
 }
 
@@ -98,27 +98,29 @@ void extend_to_ndl(decostate_t *ds, const double depth, const double ascrate, co
     /* add segment to reach ndl */
     if (ndl) {
         add_segment_const(ds, depth, ndl, gas);
-        seg_cb((waypoint_t){.depth = depth, .time = ndl, .gas = gas}, SEG_NDL);
+        seg_cb(ds, (waypoint_t){.depth = depth, .time = ndl, .gas = gas}, SEG_NDL);
     }
 
     /* either ascend directly or make a safety stop */
     if (depth < SAFETY_STOP_DEPTH || ds->max_depth < abs_depth(msw_to_bar(10))) {
         /* surface */
         add_segment_ascdec(ds, depth, SURFACE_PRESSURE, gauge_depth(depth) / ascrate, gas);
-        seg_cb((waypoint_t){.depth = SURFACE_PRESSURE, .time = gauge_depth(depth) / ascrate, .gas = gas}, SEG_SURFACE);
+        seg_cb(ds, (waypoint_t){.depth = SURFACE_PRESSURE, .time = gauge_depth(depth) / ascrate, .gas = gas},
+               SEG_SURFACE);
     } else {
         /* ascend to safety stop */
         add_segment_ascdec(ds, depth, SAFETY_STOP_DEPTH, (depth - SAFETY_STOP_DEPTH) / ascrate, gas);
-        seg_cb((waypoint_t){.depth = SAFETY_STOP_DEPTH, .time = (depth - SAFETY_STOP_DEPTH) / ascrate, .gas = gas},
+        seg_cb(ds, (waypoint_t){.depth = SAFETY_STOP_DEPTH, .time = (depth - SAFETY_STOP_DEPTH) / ascrate, .gas = gas},
                SEG_TRAVEL);
 
         /* stop for 3 minutes */
         add_segment_const(ds, SAFETY_STOP_DEPTH, 3, gas);
-        seg_cb((waypoint_t){.depth = SAFETY_STOP_DEPTH, .time = 3, .gas = gas}, SEG_SAFETY_STOP);
+        seg_cb(ds, (waypoint_t){.depth = SAFETY_STOP_DEPTH, .time = 3, .gas = gas}, SEG_SAFETY_STOP);
 
         /* surface */
         add_segment_ascdec(ds, SAFETY_STOP_DEPTH, SURFACE_PRESSURE, gauge_depth(SAFETY_STOP_DEPTH) / ascrate, gas);
-        seg_cb((waypoint_t){.depth = SURFACE_PRESSURE, .time = gauge_depth(SAFETY_STOP_DEPTH) / ascrate, .gas = gas},
+        seg_cb(ds,
+               (waypoint_t){.depth = SURFACE_PRESSURE, .time = gauge_depth(SAFETY_STOP_DEPTH) / ascrate, .gas = gas},
                SEG_SURFACE);
     }
 }
@@ -168,6 +170,7 @@ decoinfo_t calc_deco(decostate_t *ds, const double start_depth, const gas_t *sta
                     /* ascend to switch depth */
                     ret.tts += add_segment_ascdec(ds, depth, switch_depth, (depth - switch_depth) / asc_per_min, gas);
                     seg_cb(
+                        ds,
                         (waypoint_t){.depth = switch_depth, .time = (depth - switch_depth) / asc_per_min, .gas = gas},
                         SEG_TRAVEL);
 
@@ -178,7 +181,7 @@ decoinfo_t calc_deco(decostate_t *ds, const double start_depth, const gas_t *sta
                     gas = next;
 
                     add_segment_const(ds, switch_depth, 1, gas);
-                    seg_cb((waypoint_t){.depth = depth, .time = 1, .gas = gas}, SEG_GAS_SWITCH);
+                    seg_cb(ds, (waypoint_t){.depth = depth, .time = 1, .gas = gas}, SEG_GAS_SWITCH);
 
                     continue;
                 }
@@ -187,10 +190,10 @@ decoinfo_t calc_deco(decostate_t *ds, const double start_depth, const gas_t *sta
             ret.tts += add_segment_ascdec(ds, depth, stopdep, (depth - stopdep) / asc_per_min, gas);
 
             if (stopdep <= SURFACE_PRESSURE)
-                seg_cb((waypoint_t){.depth = stopdep, .time = (depth - stopdep) / asc_per_min, .gas = gas},
+                seg_cb(ds, (waypoint_t){.depth = stopdep, .time = (depth - stopdep) / asc_per_min, .gas = gas},
                        SEG_SURFACE);
             else
-                seg_cb((waypoint_t){.depth = stopdep, .time = (depth - stopdep) / asc_per_min, .gas = gas},
+                seg_cb(ds, (waypoint_t){.depth = stopdep, .time = (depth - stopdep) / asc_per_min, .gas = gas},
                        SEG_TRAVEL);
 
             depth = stopdep;
@@ -220,7 +223,7 @@ decoinfo_t calc_deco(decostate_t *ds, const double start_depth, const gas_t *sta
             stoplen += add_segment_const(ds, depth, 1, gas);
 
         ret.tts += stoplen;
-        seg_cb((waypoint_t){.depth = depth, .time = stoplen, .gas = gas}, SEG_DECO_STOP);
+        seg_cb(ds, (waypoint_t){.depth = depth, .time = stoplen, .gas = gas}, SEG_DECO_STOP);
     }
 
     return ret;

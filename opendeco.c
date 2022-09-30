@@ -10,7 +10,7 @@
 
 #define MOD_OXY (abs_depth(msw_to_bar(6)))
 
-void print_segment_callback(const waypoint_t wp, segtype_t type)
+void print_segment_callback(const decostate_t *ds, const waypoint_t wp, segtype_t type)
 {
     static double last_depth;
     static double runtime;
@@ -32,7 +32,7 @@ void print_segment_callback(const waypoint_t wp, segtype_t type)
     last_depth = wp.depth;
 }
 
-void empty_callback(const waypoint_t wp, segtype_t type)
+void empty_callback(const decostate_t *ds, const waypoint_t wp, segtype_t type)
 {
 }
 
