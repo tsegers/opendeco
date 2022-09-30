@@ -144,7 +144,7 @@ decoinfo_t calc_deco(decostate_t *ds, const double start_depth, const gas_t *sta
                     /* switch gas */
                     gas = next;
 
-                    add_segment_const(ds, switch_depth, 1, gas);
+                    ret.tts += add_segment_const(ds, switch_depth, 1, gas);
                     seg_cb(ds, (waypoint_t){.depth = depth, .time = 1, .gas = gas}, SEG_GAS_SWITCH);
 
                     continue;
