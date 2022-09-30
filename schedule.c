@@ -5,7 +5,6 @@
 
 #include "schedule.h"
 
-#define SAFETY_STOP_DEPTH (abs_depth(msw_to_bar(6)))
 #define SWITCH_INTERMEDIATE 1
 
 const gas_t *best_gas(const double depth, const gas_t *gasses, const int nof_gasses)
@@ -88,41 +87,6 @@ double calc_ndl(decostate_t *ds, const double depth, const double ascrate, const
     }
 
     return ndl;
-}
-
-void extend_to_ndl(decostate_t *ds, const double depth, const double ascrate, const gas_t *gas,
-                   segment_callback_t seg_cb)
-{
-    double ndl = calc_ndl(ds, depth, ascrate, gas);
-
-    /* add segment to reach ndl */
-    if (ndl) {
-        add_segment_const(ds, depth, ndl, gas);
-        seg_cb(ds, (waypoint_t){.depth = depth, .time = ndl, .gas = gas}, SEG_NDL);
-    }
-
-    /* either ascend directly or make a safety stop */
-    if (depth < SAFETY_STOP_DEPTH || ds->max_depth < abs_depth(msw_to_bar(10))) {
-        /* surface */
-        add_segment_ascdec(ds, depth, SURFACE_PRESSURE, gauge_depth(depth) / ascrate, gas);
-        seg_cb(ds, (waypoint_t){.depth = SURFACE_PRESSURE, .time = gauge_depth(depth) / ascrate, .gas = gas},
-               SEG_SURFACE);
-    } else {
-        /* ascend to safety stop */
-        add_segment_ascdec(ds, depth, SAFETY_STOP_DEPTH, (depth - SAFETY_STOP_DEPTH) / ascrate, gas);
-        seg_cb(ds, (waypoint_t){.depth = SAFETY_STOP_DEPTH, .time = (depth - SAFETY_STOP_DEPTH) / ascrate, .gas = gas},
-               SEG_TRAVEL);
-
-        /* stop for 3 minutes */
-        add_segment_const(ds, SAFETY_STOP_DEPTH, 3, gas);
-        seg_cb(ds, (waypoint_t){.depth = SAFETY_STOP_DEPTH, .time = 3, .gas = gas}, SEG_SAFETY_STOP);
-
-        /* surface */
-        add_segment_ascdec(ds, SAFETY_STOP_DEPTH, SURFACE_PRESSURE, gauge_depth(SAFETY_STOP_DEPTH) / ascrate, gas);
-        seg_cb(ds,
-               (waypoint_t){.depth = SURFACE_PRESSURE, .time = gauge_depth(SAFETY_STOP_DEPTH) / ascrate, .gas = gas},
-               SEG_SURFACE);
-    }
 }
 
 decoinfo_t calc_deco(decostate_t *ds, const double start_depth, const gas_t *start_gas, const gas_t *deco_gasses,
