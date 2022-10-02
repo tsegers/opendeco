@@ -158,7 +158,7 @@ decoinfo_t calc_deco(decostate_t *ds, const double start_depth, const gas_t *sta
 
             if (should_switch(&next, &switch_depth, ds, depth, next_stop, deco_gasses, nof_gasses)) {
                 /* ascend to gas switch */
-                ret.tts += add_segment_ascdec(ds, depth, switch_depth, (depth - switch_depth) / asc_per_min, gas);
+                ret.tts += add_segment_ascdec(ds, depth, switch_depth, fabs(depth - switch_depth) / asc_per_min, gas);
                 depth = switch_depth;
                 current_gf = get_gf(ds, depth);
 
@@ -167,7 +167,7 @@ decoinfo_t calc_deco(decostate_t *ds, const double start_depth, const gas_t *sta
                  * any number of consecutive travel segments and the waypoint
                  * callback should be called.
                  */
-                waypoint_time = (last_waypoint_depth - depth) / asc_per_min;
+                waypoint_time = fabs(last_waypoint_depth - depth) / asc_per_min;
                 wp_cb(ds, (waypoint_t){.depth = depth, .time = waypoint_time, .gas = gas}, SEG_TRAVEL);
                 last_waypoint_depth = depth;
 
@@ -181,7 +181,7 @@ decoinfo_t calc_deco(decostate_t *ds, const double start_depth, const gas_t *sta
             }
 
             /* ascend to current ceiling */
-            ret.tts += add_segment_ascdec(ds, depth, next_stop, (depth - next_stop) / asc_per_min, gas);
+            ret.tts += add_segment_ascdec(ds, depth, next_stop, fabs(depth - next_stop) / asc_per_min, gas);
             depth = next_stop;
             current_gf = get_gf(ds, depth);
 
@@ -194,7 +194,7 @@ decoinfo_t calc_deco(decostate_t *ds, const double start_depth, const gas_t *sta
              * any number of consecutive travel segments and the waypoint
              * callback should be called.
              */
-            waypoint_time = (last_waypoint_depth - depth) / asc_per_min;
+            waypoint_time = fabs(last_waypoint_depth - depth) / asc_per_min;
 
             if (depth <= SURFACE_PRESSURE)
                 wp_cb(ds, (waypoint_t){.depth = depth, .time = waypoint_time, .gas = gas}, SEG_SURFACE);
