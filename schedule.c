@@ -51,7 +51,7 @@ int direct_ascent(const decostate_t *ds, const double depth, const double time, 
     return ceiling(&ds_, ds_.gfhi) <= SURFACE_PRESSURE;
 }
 
-void simulate_dive(decostate_t *ds, waypoint_t *waypoints, const int nof_waypoints, segment_callback_t seg_cb)
+void simulate_dive(decostate_t *ds, waypoint_t *waypoints, const int nof_waypoints, waypoint_callback_t wp_cb)
 {
     double depth = SURFACE_PRESSURE;
     double runtime = 0;
@@ -68,7 +68,7 @@ void simulate_dive(decostate_t *ds, waypoint_t *waypoints, const int nof_waypoin
             runtime += add_segment_const(ds, d, t, g);
         }
 
-        seg_cb(ds, (waypoint_t){.depth = d, .time = t, .gas = g}, SEG_DIVE);
+        wp_cb(ds, (waypoint_t){.depth = d, .time = t, .gas = g}, SEG_DIVE);
     }
 }
 
@@ -89,8 +89,31 @@ double calc_ndl(decostate_t *ds, const double depth, const double ascrate, const
     return ndl;
 }
 
+int should_switch(const gas_t **next, double *switch_depth, const decostate_t *ds, const double depth,
+                  const double next_stop, const gas_t *deco_gasses, const int nof_gasses)
+{
+    /* check if we switch at MOD or just at stops */
+    if (!SWITCH_INTERMEDIATE)
+        return 0;
+
+    /* check if there is a gas to switch to */
+    *next = next_gas(depth, deco_gasses, nof_gasses);
+
+    if (*next == NULL)
+        return 0;
+
+    /* check if the switch happens before the current ceiling */
+    *switch_depth = round_ceiling(ds, (*next)->mod) - ds->ceil_multiple;
+    assert(*switch_depth <= (*next)->mod);
+
+    if (*switch_depth <= next_stop)
+        return 0;
+
+    return 1;
+}
+
 decoinfo_t calc_deco(decostate_t *ds, const double start_depth, const gas_t *start_gas, const gas_t *deco_gasses,
-                     const int nof_gasses, segment_callback_t seg_cb)
+                     const int nof_gasses, waypoint_callback_t wp_cb)
 {
     decoinfo_t ret = {.tts = 0, .ndl = 0};
 
@@ -120,52 +143,63 @@ decoinfo_t calc_deco(decostate_t *ds, const double start_depth, const gas_t *sta
 
     /* alternate between ascending and stopping */
     for (;;) {
+        /* extra bookkeeping because waypoints and segments do not match 1:1 */
+        double last_waypoint_depth = depth;
+        double waypoint_time;
+
         /* ascend */
         for (;;) {
-            double stopdep = ceiling(ds, current_gf);
-            const gas_t *next = next_gas(depth, deco_gasses, nof_gasses);
+            /* determine next stop */
+            double next_stop = ceiling(ds, current_gf);
 
-            if (SWITCH_INTERMEDIATE && next) {
-                /* determine switch depth */
-                double switch_depth = round_ceiling(ds, next->mod) - ds->ceil_multiple;
-                assert(switch_depth <= next->mod);
+            /* find out if we need to switch gas on the way */
+            const gas_t *next;
+            double switch_depth;
 
-                if (switch_depth > stopdep) {
-                    /* ascend to switch depth */
-                    ret.tts += add_segment_ascdec(ds, depth, switch_depth, (depth - switch_depth) / asc_per_min, gas);
-                    seg_cb(
-                        ds,
-                        (waypoint_t){.depth = switch_depth, .time = (depth - switch_depth) / asc_per_min, .gas = gas},
-                        SEG_TRAVEL);
+            if (should_switch(&next, &switch_depth, ds, depth, next_stop, deco_gasses, nof_gasses)) {
+                /* ascend to gas switch */
+                ret.tts += add_segment_ascdec(ds, depth, switch_depth, (depth - switch_depth) / asc_per_min, gas);
+                depth = switch_depth;
+                current_gf = get_gf(ds, depth);
 
-                    depth = switch_depth;
-                    current_gf = get_gf(ds, depth);
+                /*
+                 * since we're stopping for a switch next, this is the last of
+                 * any number of consecutive travel segments and the waypoint
+                 * callback should be called.
+                 */
+                waypoint_time = (last_waypoint_depth - depth) / asc_per_min;
+                wp_cb(ds, (waypoint_t){.depth = depth, .time = waypoint_time, .gas = gas}, SEG_TRAVEL);
+                last_waypoint_depth = depth;
 
-                    /* switch gas */
-                    gas = next;
+                /* switch gas */
+                gas = next;
 
-                    ret.tts += add_segment_const(ds, switch_depth, 1, gas);
-                    seg_cb(ds, (waypoint_t){.depth = depth, .time = 1, .gas = gas}, SEG_GAS_SWITCH);
+                ret.tts += add_segment_const(ds, switch_depth, 1, gas);
+                wp_cb(ds, (waypoint_t){.depth = depth, .time = 1, .gas = gas}, SEG_GAS_SWITCH);
 
-                    continue;
-                }
+                continue;
             }
 
-            ret.tts += add_segment_ascdec(ds, depth, stopdep, (depth - stopdep) / asc_per_min, gas);
-
-            if (stopdep <= SURFACE_PRESSURE)
-                seg_cb(ds, (waypoint_t){.depth = stopdep, .time = (depth - stopdep) / asc_per_min, .gas = gas},
-                       SEG_SURFACE);
-            else
-                seg_cb(ds, (waypoint_t){.depth = stopdep, .time = (depth - stopdep) / asc_per_min, .gas = gas},
-                       SEG_TRAVEL);
-
-            depth = stopdep;
+            /* ascend to current ceiling */
+            ret.tts += add_segment_ascdec(ds, depth, next_stop, (depth - next_stop) / asc_per_min, gas);
+            depth = next_stop;
             current_gf = get_gf(ds, depth);
 
             /* if the ceiling moved while we ascended, keep ascending */
             if (depth > ceiling(ds, current_gf))
                 continue;
+
+            /*
+             * since we've actually reached the ceiling, this is the last of
+             * any number of consecutive travel segments and the waypoint
+             * callback should be called.
+             */
+            waypoint_time = (last_waypoint_depth - depth) / asc_per_min;
+
+            if (depth <= SURFACE_PRESSURE)
+                wp_cb(ds, (waypoint_t){.depth = depth, .time = waypoint_time, .gas = gas}, SEG_SURFACE);
+            else
+                wp_cb(ds, (waypoint_t){.depth = depth, .time = waypoint_time, .gas = gas}, SEG_TRAVEL);
 
             break;
         }
@@ -187,7 +221,7 @@ decoinfo_t calc_deco(decostate_t *ds, const double start_depth, const gas_t *sta
             stoplen += add_segment_const(ds, depth, 1, gas);
 
         ret.tts += stoplen;
-        seg_cb(ds, (waypoint_t){.depth = depth, .time = stoplen, .gas = gas}, SEG_DECO_STOP);
+        wp_cb(ds, (waypoint_t){.depth = depth, .time = stoplen, .gas = gas}, SEG_DECO_STOP);
     }
 
     return ret;
