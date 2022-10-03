@@ -7,6 +7,9 @@
 
 #define SWITCH_INTERMEDIATE 1
 
+#define STOPLEN_ROUGH 10
+#define STOPLEN_FINE 1
+
 const gas_t *best_gas(const double depth, const gas_t *gasses, const int nof_gasses)
 {
     const gas_t *best = NULL;
@@ -90,19 +93,38 @@ double calc_ndl(decostate_t *ds, const double depth, const double ascrate, const
     return ndl;
 }
 
-double calc_stoplen_rough(decostate_t *ds, const double depth, const double current_gf, const gas_t *gas)
+double calc_stoplen_rough(const decostate_t *ds, const double depth, const double current_gf, const gas_t *gas)
 {
     decostate_t ds_ = *ds;
     double stoplen = 0;
 
-    while (1) {
-        double tmp = add_segment_const(&ds_, depth, 10, gas);
+    for (;;) {
+        double tmp = add_segment_const(&ds_, depth, STOPLEN_ROUGH, gas);
 
         if (ceiling(&ds_, current_gf) != depth)
             break;
 
         stoplen += tmp;
     }
+
+    return stoplen;
+}
+
+double deco_stop(decostate_t *ds, const double depth, const double current_gf, const gas_t *gas)
+{
+    double stoplen = 0;
+
+    /* rough steps */
+    double stoplen_rough = calc_stoplen_rough(ds, depth, current_gf, gas);
+
+    if (stoplen_rough) {
+        add_segment_const(ds, depth, stoplen_rough, gas);
+        stoplen += stoplen_rough;
+    }
+
+    /* fine steps */
+    while (ceiling(ds, current_gf) == depth)
+        stoplen += add_segment_const(ds, depth, STOPLEN_FINE, gas);
 
     return stoplen;
 }
@@ -237,20 +259,7 @@ decoinfo_t calc_deco(decostate_t *ds, const double start_depth, const gas_t *sta
             gas = best;
 
         /* stop */
-        double stoplen = 0;
-
-        /* rough steps */
-        double stoplen_rough = calc_stoplen_rough(ds, depth, current_gf, gas);
-
-        if (stoplen_rough) {
-            add_segment_const(ds, depth, stoplen_rough, gas);
-            stoplen += stoplen_rough;
-        }
-
-        /* fine steps */
-        while (ceiling(ds, current_gf) == depth)
-            stoplen += add_segment_const(ds, depth, 1, gas);
-
+        double stoplen = deco_stop(ds, depth, current_gf, gas);
         ret.tts += stoplen;
 
         if (wp_cb)
