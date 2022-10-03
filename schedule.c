@@ -68,7 +68,8 @@ void simulate_dive(decostate_t *ds, waypoint_t *waypoints, const int nof_waypoin
             runtime += add_segment_const(ds, d, t, g);
         }
 
-        wp_cb(ds, (waypoint_t){.depth = d, .time = t, .gas = g}, SEG_DIVE);
+        if (wp_cb)
+            wp_cb(ds, (waypoint_t){.depth = d, .time = t, .gas = g}, SEG_DIVE);
     }
 }
 
@@ -168,14 +169,19 @@ decoinfo_t calc_deco(decostate_t *ds, const double start_depth, const gas_t *sta
                  * callback should be called.
                  */
                 waypoint_time = fabs(last_waypoint_depth - depth) / asc_per_min;
-                wp_cb(ds, (waypoint_t){.depth = depth, .time = waypoint_time, .gas = gas}, SEG_TRAVEL);
+
+                if (wp_cb)
+                    wp_cb(ds, (waypoint_t){.depth = depth, .time = waypoint_time, .gas = gas}, SEG_TRAVEL);
+
                 last_waypoint_depth = depth;
 
                 /* switch gas */
                 gas = next;
 
                 ret.tts += add_segment_const(ds, switch_depth, 1, gas);
-                wp_cb(ds, (waypoint_t){.depth = depth, .time = 1, .gas = gas}, SEG_GAS_SWITCH);
+
+                if (wp_cb)
+                    wp_cb(ds, (waypoint_t){.depth = depth, .time = 1, .gas = gas}, SEG_GAS_SWITCH);
 
                 continue;
             }
@@ -195,11 +201,10 @@ decoinfo_t calc_deco(decostate_t *ds, const double start_depth, const gas_t *sta
              * callback should be called.
              */
             waypoint_time = fabs(last_waypoint_depth - depth) / asc_per_min;
+            enum segtype_t segtype = depth <= SURFACE_PRESSURE ? SEG_SURFACE : SEG_TRAVEL;
 
-            if (depth <= SURFACE_PRESSURE)
-                wp_cb(ds, (waypoint_t){.depth = depth, .time = waypoint_time, .gas = gas}, SEG_SURFACE);
-            else
-                wp_cb(ds, (waypoint_t){.depth = depth, .time = waypoint_time, .gas = gas}, SEG_TRAVEL);
+            if (wp_cb)
+                wp_cb(ds, (waypoint_t){.depth = depth, .time = waypoint_time, .gas = gas}, segtype);
 
             break;
         }
@@ -221,7 +226,9 @@ decoinfo_t calc_deco(decostate_t *ds, const double start_depth, const gas_t *sta
             stoplen += add_segment_const(ds, depth, 1, gas);
 
         ret.tts += stoplen;
-        wp_cb(ds, (waypoint_t){.depth = depth, .time = stoplen, .gas = gas}, SEG_DECO_STOP);
+
+        if (wp_cb)
+            wp_cb(ds, (waypoint_t){.depth = depth, .time = stoplen, .gas = gas}, SEG_DECO_STOP);
     }
 
     return ret;

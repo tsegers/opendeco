@@ -32,10 +32,6 @@ void print_segment_callback(const decostate_t *ds, const waypoint_t wp, segtype_
     last_depth = wp.depth;
 }
 
-void empty_callback(const decostate_t *ds, const waypoint_t wp, segtype_t type)
-{
-}
-
 int main(int argc, const char *argv[])
 {
     setlocale(LC_ALL, "en_US.utf8");
@@ -68,7 +64,7 @@ int main(int argc, const char *argv[])
     /* determine @+5 TTS */
     decostate_t ds_ = ds;
     add_segment_const(&ds_, depth, 5, gas);
-    decoinfo_t di_plus5 = calc_deco(&ds_, depth, gas, deco_gasses, len(deco_gasses), &empty_callback);
+    decoinfo_t di_plus5 = calc_deco(&ds_, depth, gas, deco_gasses, len(deco_gasses), NULL);
 
     /* print actual deco schedule */
     decoinfo_t di = calc_deco(&ds, depth, gas, deco_gasses, len(deco_gasses), &print_segment_callback);
