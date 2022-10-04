@@ -49,14 +49,14 @@ int direct_ascent(const decostate_t *ds, const double depth, const double time, 
     decostate_t ds_ = *ds;
     assert(ds_.firststop == -1);
 
-    add_segment_ascdec(&ds_, depth, SURFACE_PRESSURE, time, gas);
+    add_segment_ascdec(&ds_, depth, abs_depth(0), time, gas);
 
-    return ceiling(&ds_, ds_.gfhi) <= SURFACE_PRESSURE;
+    return gauge_depth(ceiling(&ds_, ds_.gfhi)) <= 0;
 }
 
 void simulate_dive(decostate_t *ds, waypoint_t *waypoints, const int nof_waypoints, waypoint_callback_t wp_cb)
 {
-    double depth = SURFACE_PRESSURE;
+    double depth = abs_depth(0);
     double runtime = 0;
 
     for (int i = 0; i < nof_waypoints; i++) {
@@ -240,7 +240,7 @@ decoinfo_t calc_deco(decostate_t *ds, const double start_depth, const gas_t *sta
              * callback should be called.
              */
             waypoint_time = fabs(last_waypoint_depth - depth) / asc_per_min;
-            enum segtype_t segtype = depth <= SURFACE_PRESSURE ? SEG_SURFACE : SEG_TRAVEL;
+            enum segtype_t segtype = depth <= abs_depth(0) ? SEG_SURFACE : SEG_TRAVEL;
 
             if (wp_cb)
                 wp_cb(ds, (waypoint_t){.depth = depth, .time = waypoint_time, .gas = gas}, segtype);
@@ -249,7 +249,7 @@ decoinfo_t calc_deco(decostate_t *ds, const double start_depth, const gas_t *sta
         }
 
         /* terminate if we surfaced */
-        if (depth <= SURFACE_PRESSURE)
+        if (depth <= abs_depth(0))
             break;
 
         /* switch to better gas if available */
