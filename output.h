@@ -16,4 +16,6 @@ void print_planhead();
 void print_planline(const wchar_t sign, const double depth, const double time, const double runtime, const gas_t *gas);
 void print_planfoot(const decostate_t *ds);
 
+void scan_gas(gas_t *gas, char *str);
+
 #endif /* end of include guard: OUTPUT_H */

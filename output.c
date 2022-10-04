@@ -2,6 +2,7 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "output.h"
 
@@ -29,6 +30,28 @@ void format_gas(char *buf, const size_t buflen, const gas_t *gas)
         snprintf(buf, buflen, "Nitrox %i", gas_o2(gas));
     else
         snprintf(buf, buflen, "%i/%i", gas_o2(gas), gas_he(gas));
+}
+
+void scan_gas(gas_t *gas, char *str)
+{
+    int o2 = 0;
+    int he = 0;
+
+    if (!strcmp(str, "Air")) {
+        *gas = gas_new(21, 0, MOD_AUTO);
+        return;
+    } else if (!strcmp(str, "Oxygen")) {
+        *gas = gas_new(100, 0, MOD_AUTO);
+        return;
+    } else if (!strncmp(str, "EAN", strlen("EAN"))) {
+        sscanf(str, "EAN%i", &o2);
+    } else if (!strncmp(str, "Nitrox", strlen("Nitrox"))) {
+        sscanf(str, "Nitrox %i", &o2);
+    } else {
+        sscanf(str, "%i/%i", &o2, &he);
+    }
+
+    *gas = gas_new(o2, he, MOD_AUTO);
 }
 
 void print_planhead()
