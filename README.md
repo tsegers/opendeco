@@ -1,5 +1,7 @@
 # opendeco
 
+[![builds.sr.ht status](https://builds.sr.ht/~tsegers/opendeco/commits/main.svg)](https://builds.sr.ht/~tsegers/opendeco/commits/main?)
+
 ```Usage: opendeco [OPTION...]
 Implementation of Buhlmann ZH-L16 with Gradient Factors:
 
