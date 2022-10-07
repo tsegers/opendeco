@@ -24,7 +24,7 @@ static char doc[] = "Implementation of Buhlmann ZH-L16 with Gradient Factors:"
                     "\t./opendeco -d 18 -t 60 -g Air\n"
                     "\t./opendeco -d 30 -t 60 -g EAN32\n"
                     "\t./opendeco -d 40 -t 120 -g 21/35 -l 20 -h 80 --decogasses Oxygen,EAN50\n";
-const char *argp_program_bug_address = "<~tsegers/opendeco@lists.sr.ht>";
+const char *argp_program_bug_address = "<~tsegers/opendeco@lists.sr.ht> or https://todo.sr.ht/~tsegers/opendeco";
 const char *argp_program_version = "opendeco " VERSION;
 
 static struct argp_option options[] = {

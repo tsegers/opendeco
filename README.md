@@ -2,7 +2,7 @@
 
 [![builds.sr.ht status](https://builds.sr.ht/~tsegers/opendeco/commits/main.svg)](https://builds.sr.ht/~tsegers/opendeco/commits/main?)
 
-```Usage: opendeco [OPTION...]
+```Usage: opendeco [OPTION...] 
 Implementation of Buhlmann ZH-L16 with Gradient Factors:
 
   -d, --depth=NUMBER         Set the depth of the dive in meters
@@ -27,5 +27,6 @@ Examples:
         ./opendeco -d 30 -t 60 -g EAN32
         ./opendeco -d 40 -t 120 -g 21/35 -l 20 -h 80 --decogasses Oxygen,EAN50
 
-Report bugs to <~tsegers/opendeco@lists.sr.ht>.
+Report bugs to <~tsegers/opendeco@lists.sr.ht> or
+https://todo.sr.ht/~tsegers/opendeco.
 ```
