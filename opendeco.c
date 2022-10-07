@@ -52,10 +52,10 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
 
     switch (key) {
     case 'd':
-        arguments->depth = arg ? atof(arg) : 0;
+        arguments->depth = arg ? atof(arg) : -1;
         break;
     case 't':
-        arguments->time = arg ? atof(arg) : 0;
+        arguments->time = arg ? atof(arg) : -1;
         break;
     case 'g':
         arguments->gas = arg;
@@ -70,7 +70,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
         arguments->gfhigh = arg ? atoi(arg) : 100;
         break;
     case ARGP_KEY_END:
-        if (arguments->depth == 0 || arguments->time == 0) {
+        if (arguments->depth < 0 || arguments->time < 0) {
             argp_state_help(state, stderr, ARGP_HELP_USAGE);
             argp_failure(state, 1, 0, "Options -d and -t are required. See --help for more information");
             exit(ARGP_ERR_UNKNOWN);
@@ -151,8 +151,8 @@ int main(int argc, char *argv[])
     /* argp */
     struct arguments arguments;
 
-    arguments.depth = 0;
-    arguments.time = 0;
+    arguments.depth = -1;
+    arguments.time = -1;
     arguments.gas = "Air";
     arguments.gflow = 30;
     arguments.gfhigh = 75;
@@ -178,10 +178,11 @@ int main(int argc, char *argv[])
 
     /* simulate dive */
     double descent_time = msw_to_bar(arguments.depth) / dec_per_min;
+    double bottom_time = max(1, arguments.time - descent_time);
 
     waypoint_t waypoints[] = {
-        {.depth = abs_depth(msw_to_bar(arguments.depth)), .time = descent_time,                  &bottom_gas},
-        {.depth = abs_depth(msw_to_bar(arguments.depth)), .time = arguments.time - descent_time, &bottom_gas},
+        {.depth = abs_depth(msw_to_bar(arguments.depth)), .time = descent_time, &bottom_gas},
+        {.depth = abs_depth(msw_to_bar(arguments.depth)), .time = bottom_time,  &bottom_gas},
     };
 
     print_planhead();
