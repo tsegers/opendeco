@@ -2,12 +2,14 @@ image: debian/stable
 packages:
   - build-essential
   - clang-format-13
+sources:
+  - https://git.sr.ht/~tsegers/opendeco
 tasks:
-    - build: |
-        cd opendeco
-        make
-    - check-format: |
-        cd opendeco
-        clang-format-13 -n --Werror *.c *.h
+  - build: |
+      cd opendeco
+      make
+  - check-format: |
+      cd opendeco
+      clang-format-13 -n --Werror *.c *.h
 artifacts:
-    - opendeco/opendeco
+  - opendeco/opendeco
