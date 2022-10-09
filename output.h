@@ -10,7 +10,7 @@
 #define ASC 0x2197 /* Unicode North East Arrow */
 #define LVL 0x2192 /* Unicode Rightwards Arrow */
 #define DEC 0x2198 /* Unicode South East Arrow */
-#define SWI 0x1F5D8 /* Clockwise Right and Left Semicircle Arrows */
+#define SWI 0x21BB /* Clockwise Open Circle Arrow */
 
 void print_planhead();
 void print_planline(const wchar_t sign, const double depth, const double time, const double runtime, const gas_t *gas);
