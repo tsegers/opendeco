@@ -7,7 +7,7 @@ sources:
 tasks:
   - check-format: |
       cd opendeco
-      clang-format-13 -n --Werror *.c *.h
+      clang-format-13 -n --Werror src/*.c src/*.h test/*.c test/*.h
   - build: |
       cd opendeco
       make

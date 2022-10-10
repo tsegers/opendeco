@@ -1,6 +1,6 @@
 #include "minunit.h"
 
-#include "../deco.h"
+#include "../src/deco.h"
 
 MU_TEST(test_bar_to_msw)
 {
