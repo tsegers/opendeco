@@ -2,13 +2,21 @@ VERSION=\"$(shell git describe --tags --dirty)\"
 
 PREFIX = /usr/local
 
-all: opendeco opendeco_test
+all: opendeco opendeco_test libopendeco.a
 
 opendeco: src/opendeco.c src/deco.c src/deco.h src/schedule.c src/schedule.h src/output.c src/output.h
 	gcc --std=c99 -pedantic -Wall -Werror -O3 -DVERSION=${VERSION} src/opendeco.c src/deco.c src/schedule.c src/output.c -lm -o opendeco
 
 opendeco_test: test/opendeco_test.c test/deco_test.c src/deco.c 
 	gcc --std=c99 -pedantic -Wall -Werror -O3 test/minunit.c test/opendeco_test.c test/deco_test.c src/deco.c -lm -o opendeco_test
+
+libopendeco.a:
+	gcc -c src/deco.c -o src/deco.o
+	gcc -c src/schedule.c -o src/schedule.o
+	gcc -c src/output.c -o src/output.o
+	ar rs libopendeco.a src/deco.o src/schedule.o src/output.o
+
+lib: libopendeco.a
 
 run: opendeco
 	./opendeco -d 30 -t 120 -g EAN32 --decogasses EAN50
@@ -25,5 +33,7 @@ uninstall:
 	rm -f ${DESTDIR}${PREFIX}/bin/opendeco
 
 clean:
-	rm opendeco
-	rm opendeco_test
+	rm -f opendeco
+	rm -f opendeco_test
+	rm -f src/*.o
+	rm -f libopendeco.a
