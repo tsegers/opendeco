@@ -98,7 +98,7 @@ gas_t gas_new(const unsigned char o2, const unsigned char he, double mod)
 
 int gas_equal(const gas_t *g1, const gas_t *g2)
 {
-    return g1->o2 == g2->o2 && g1->he == g2->he;
+    return g1->o2 == g2->o2 && g1->he == g2->he && g1->mod == g2->mod;
 }
 
 unsigned char gas_o2(const gas_t *gas)
