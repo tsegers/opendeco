@@ -21,21 +21,24 @@
 static char args_doc[] = "";
 static char doc[] = "Implementation of Buhlmann ZH-L16 with Gradient Factors:"
                     "\vExamples:\n\n"
-                    "\t./opendeco -d 18 -t 60 -g Air\n"
-                    "\t./opendeco -d 30 -t 60 -g EAN32\n"
-                    "\t./opendeco -d 40 -t 120 -g 21/35 -l 20 -h 80 --decogasses Oxygen,EAN50\n";
+                    "  ./opendeco -d 18 -t 60 -g Air\n"
+                    "  ./opendeco -d 30 -t 60 -g EAN32\n"
+                    "  ./opendeco -d 40 -t 120 -g 21/35 -l 20 -h 80 --decogasses Oxygen,EAN50\n";
 const char *argp_program_bug_address = "<~tsegers/opendeco@lists.sr.ht> or https://todo.sr.ht/~tsegers/opendeco";
 const char *argp_program_version = "opendeco " VERSION;
 
 static struct argp_option options[] = {
+    {0,            0,   0,        0,                   "Dive options:",                                                0},
     {"depth",      'd', "NUMBER", 0,                   "Set the depth of the dive in meters",                          0},
     {"time",       't', "NUMBER", 0,                   "Set the time of the dive in minutes",                          1},
     {"gas",        'g', "STRING", 0,                   "Set the bottom gas used during the dive, defaults to Air",     2},
-    {"pressure",   'p', "STRING", 0,                   "Set the surface air pressure, defaults to 1.01325bar or 1atm", 3},
-    {0,            's', 0,        OPTION_ARG_OPTIONAL, "Only switch gas at deco stops",                                4},
-    {"gflow",      'l', "NUMBER", 0,                   "Set the gradient factor at the first stop, defaults to 30",    5},
-    {"gfhigh",     'h', "NUMBER", 0,                   "Set the gradient factor at the surface, defaults to 75",       6},
-    {"decogasses", 'G', "LIST",   0,                   "Set the gasses available for deco",                            7},
+    {"pressure",   'p', "NUMBER", 0,                   "Set the surface air pressure, defaults to 1.01325bar or 1atm", 3},
+    {0,            0,   0,        0,                   "Deco options:",                                                0},
+    {"gflow",      'l', "NUMBER", 0,                   "Set the gradient factor at the first stop, defaults to 30",    4},
+    {"gfhigh",     'h', "NUMBER", 0,                   "Set the gradient factor at the surface, defaults to 75",       5},
+    {"decogasses", 'G', "LIST",   0,                   "Set the gasses available for deco",                            6},
+    {0,            's', 0,        OPTION_ARG_OPTIONAL, "Only switch gas at deco stops",                                7},
+    {0,            0,   0,        0,                   "Informational options:",                                       0},
     {0,            0,   0,        0,                   0,                                                              0}
 };
 
