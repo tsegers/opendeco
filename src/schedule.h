@@ -5,6 +5,7 @@
 
 #include "deco.h"
 
+/* types */
 typedef struct waypoint_t {
     double depth;
     double time;
@@ -26,6 +27,10 @@ typedef enum segtype_t {
     SEG_TRAVEL,
 } segtype_t;
 
+/* global variables */
+extern int SWITCH_INTERMEDIATE;
+
+/* functions */
 typedef void (*waypoint_callback_t)(const decostate_t *ds, const waypoint_t, const segtype_t);
 
 const gas_t *best_gas(const double depth, const gas_t *gasses, const int nof_gasses);

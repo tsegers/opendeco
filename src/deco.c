@@ -6,11 +6,14 @@
 
 #include "deco.h"
 
-enum ALGO ALGO_VER = ZHL_16C;
-
-#define PO2_MAX (1.6)
-#define END_MAX (abs_depth(msw_to_bar(30)))
 #define RND(x) (round((x) *10000) / 10000)
+
+enum ALGO ALGO_VER = ZHL_16C;
+double SURFACE_PRESSURE = 1.01325;
+double P_WV = P_WV_BUHL;
+
+double PO2_MAX = 1.6;
+double END_MAX = 4.01325;
 
 typedef struct zhl_n2_t {
     double t;

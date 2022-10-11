@@ -6,8 +6,6 @@
 
 #include "output.h"
 
-extern enum ALGO ALGO_VER;
-
 void format_mm_ss(char *buf, const size_t buflen, const double time)
 {
     double mm;

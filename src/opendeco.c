@@ -28,13 +28,15 @@ const char *argp_program_bug_address = "<~tsegers/opendeco@lists.sr.ht> or https
 const char *argp_program_version = "opendeco " VERSION;
 
 static struct argp_option options[] = {
-    {"depth",      'd', "NUMBER", 0, "Set the depth of the dive in meters",                       0},
-    {"time",       't', "NUMBER", 0, "Set the time of the dive in minutes",                       1},
-    {"gas",        'g', "STRING", 0, "Set the bottom gas used during the dive, defaults to Air",  2},
-    {"gflow",      'l', "NUMBER", 0, "Set the gradient factor at the first stop, defaults to 30", 3},
-    {"gfhigh",     'h', "NUMBER", 0, "Set the gradient factor at the surface, defaults to 75",    4},
-    {"decogasses", 'G', "LIST",   0, "Set the gasses available for deco",                         5},
-    {0,            0,   0,        0, 0,                                                           0}
+    {"depth",      'd', "NUMBER", 0,                   "Set the depth of the dive in meters",                          0},
+    {"time",       't', "NUMBER", 0,                   "Set the time of the dive in minutes",                          1},
+    {"gas",        'g', "STRING", 0,                   "Set the bottom gas used during the dive, defaults to Air",     2},
+    {"pressure",   'p', "STRING", 0,                   "Set the surface air pressure, defaults to 1.01325bar or 1atm", 3},
+    {0,            's', 0,        OPTION_ARG_OPTIONAL, "Only switch gas at deco stops",                                4},
+    {"gflow",      'l', "NUMBER", 0,                   "Set the gradient factor at the first stop, defaults to 30",    5},
+    {"gfhigh",     'h', "NUMBER", 0,                   "Set the gradient factor at the surface, defaults to 75",       6},
+    {"decogasses", 'G', "LIST",   0,                   "Set the gasses available for deco",                            7},
+    {0,            0,   0,        0,                   0,                                                              0}
 };
 
 struct arguments {
@@ -44,6 +46,8 @@ struct arguments {
     int gflow;
     int gfhigh;
     char *decogasses;
+    double SURFACE_PRESSURE;
+    int SWITCH_INTERMEDIATE;
 };
 
 static error_t parse_opt(int key, char *arg, struct argp_state *state)
@@ -60,6 +64,12 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
     case 'g':
         arguments->gas = arg;
         break;
+    case 'p':
+        arguments->SURFACE_PRESSURE = arg ? atof(arg) : -1;
+        break;
+    case 's':
+        arguments->SWITCH_INTERMEDIATE = 0;
+        break;
     case 'G':
         arguments->decogasses = arg;
         break;
@@ -73,6 +83,11 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
         if (arguments->depth < 0 || arguments->time < 0) {
             argp_state_help(state, stderr, ARGP_HELP_USAGE);
             argp_failure(state, 1, 0, "Options -d and -t are required. See --help for more information");
+            exit(ARGP_ERR_UNKNOWN);
+        }
+        if (arguments->SURFACE_PRESSURE < 0) {
+            argp_state_help(state, stderr, ARGP_HELP_USAGE);
+            argp_failure(state, 1, 0, "Surface air pressure must be positive. See --help for more information");
             exit(ARGP_ERR_UNKNOWN);
         }
     default:
@@ -149,16 +164,24 @@ int main(int argc, char *argv[])
     setlocale(LC_ALL, "en_US.utf8");
 
     /* argp */
-    struct arguments arguments;
-
-    arguments.depth = -1;
-    arguments.time = -1;
-    arguments.gas = "Air";
-    arguments.gflow = 30;
-    arguments.gfhigh = 75;
-    arguments.decogasses = "";
+    struct arguments arguments = {
+        .depth = -1,
+        .time = -1,
+        .gas = "Air",
+        .gflow = 30,
+        .gfhigh = 75,
+        .decogasses = "",
+        .SURFACE_PRESSURE = 0,
+        .SWITCH_INTERMEDIATE = 1,
+    };
 
     argp_parse(&argp, argc, argv, 0, 0, &arguments);
+
+    /* apply global options */
+    if (arguments.SURFACE_PRESSURE > 0)
+        SURFACE_PRESSURE = arguments.SURFACE_PRESSURE;
+
+    SWITCH_INTERMEDIATE = arguments.SWITCH_INTERMEDIATE;
 
     /* setup */
     decostate_t ds;

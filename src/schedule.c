@@ -5,10 +5,10 @@
 
 #include "schedule.h"
 
-#define SWITCH_INTERMEDIATE 1
-
 #define STOPLEN_ROUGH 10
 #define STOPLEN_FINE 1
+
+int SWITCH_INTERMEDIATE = 1;
 
 const gas_t *best_gas(const double depth, const gas_t *gasses, const int nof_gasses)
 {

@@ -12,11 +12,10 @@
 #define P_WV_BUHL 0.0627 /* Buhlmann value, Rq = 1.0, least conservative */
 #define P_WV_NAVY 0.0567 /* US. Navy value, Rq = 0.9 */
 #define P_WV_SCHR 0.0493 /* Schreiner value, Rq = 0.8, most conservative */
-#define P_WV P_WV_BUHL
 
-#define SURFACE_PRESSURE 1.01325
 #define MOD_AUTO 0
 
+/* types */
 enum ALGO {
     ZHL_16A = 0,
     ZHL_16B = 1,
@@ -40,6 +39,15 @@ typedef struct gas_t {
     double mod;
 } gas_t;
 
+/* global variables */
+extern enum ALGO ALGO_VER;
+extern double SURFACE_PRESSURE;
+extern double P_WV;
+
+extern double PO2_MAX;
+extern double END_MAX;
+
+/* functions */
 double bar_to_msw(const double bar);
 double msw_to_bar(const double msw);
 double abs_depth(const double gd);
