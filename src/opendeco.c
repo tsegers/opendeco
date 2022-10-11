@@ -230,5 +230,6 @@ int main(int argc, char *argv[])
     wprintf(L"\nNDL: %i TTS: %i TTS @+5: %i\n", (int) floor(di.ndl), (int) ceil(di.tts), (int) ceil(di_plus5.tts));
     print_planfoot(&ds);
 
+    free(deco_gasses);
     return 0;
 }

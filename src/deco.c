@@ -290,6 +290,7 @@ void init_decostate(decostate_t *ds, const unsigned char gflo, const unsigned ch
     ds->gflo = gflo;
     ds->gfhi = gfhi;
     ds->firststop = -1;
+    ds->max_depth = 0;
     ds->ceil_multiple = ceil_multiple;
 }
 
