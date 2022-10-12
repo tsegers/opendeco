@@ -38,6 +38,7 @@ static struct argp_option options[] = {
     {"gfhigh",     'h', "NUMBER", 0,                   "Set the gradient factor at the surface, defaults to 75",       5},
     {"decogasses", 'G', "LIST",   0,                   "Set the gasses available for deco",                            6},
     {0,            's', 0,        OPTION_ARG_OPTIONAL, "Only switch gas at deco stops",                                7},
+    {0,            '6', 0,        OPTION_ARG_OPTIONAL, "Perform last deco stop at 6m",                                 8},
     {0,            0,   0,        0,                   "Informational options:",                                       0},
     {0,            0,   0,        0,                   0,                                                              0}
 };
@@ -51,6 +52,7 @@ struct arguments {
     char *decogasses;
     double SURFACE_PRESSURE;
     int SWITCH_INTERMEDIATE;
+    int LAST_STOP_AT_SIX;
 };
 
 static error_t parse_opt(int key, char *arg, struct argp_state *state)
@@ -72,6 +74,9 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
         break;
     case 's':
         arguments->SWITCH_INTERMEDIATE = 0;
+        break;
+    case '6':
+        arguments->LAST_STOP_AT_SIX = 1;
         break;
     case 'G':
         arguments->decogasses = arg;
@@ -174,17 +179,17 @@ int main(int argc, char *argv[])
         .gflow = 30,
         .gfhigh = 75,
         .decogasses = "",
-        .SURFACE_PRESSURE = 0,
-        .SWITCH_INTERMEDIATE = 1,
+        .SURFACE_PRESSURE = SURFACE_PRESSURE_DEFAULT,
+        .SWITCH_INTERMEDIATE = SWITCH_INTERMEDIATE_DEFAULT,
+        .LAST_STOP_AT_SIX = LAST_STOP_AT_SIX_DEFAULT,
     };
 
     argp_parse(&argp, argc, argv, 0, 0, &arguments);
 
     /* apply global options */
-    if (arguments.SURFACE_PRESSURE > 0)
-        SURFACE_PRESSURE = arguments.SURFACE_PRESSURE;
-
+    SURFACE_PRESSURE = arguments.SURFACE_PRESSURE;
     SWITCH_INTERMEDIATE = arguments.SWITCH_INTERMEDIATE;
+    LAST_STOP_AT_SIX = arguments.LAST_STOP_AT_SIX;
 
     /* setup */
     decostate_t ds;

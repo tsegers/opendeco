@@ -27,6 +27,8 @@ Implementation of Buhlmann ZH-L16 with Gradient Factors:
 
   -s                         Only switch gas at deco stops
 
+  -6                         Perform last deco stop at 6m
+
  Informational options:
 
   -?, --help                 Give this help list

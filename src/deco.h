@@ -20,6 +20,8 @@
 #define PO2_MAX_DEFAULT 1.6
 #define END_MAX_DEFAULT 4.01325
 
+#define LAST_STOP_AT_SIX_DEFAULT 0
+
 #define MOD_AUTO 0
 
 /* types */
@@ -53,6 +55,8 @@ extern double P_WV;
 
 extern double PO2_MAX;
 extern double END_MAX;
+
+extern int LAST_STOP_AT_SIX;
 
 /* functions */
 double bar_to_msw(const double bar);

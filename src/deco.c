@@ -15,6 +15,8 @@ double P_WV = P_WV_DEFAULT;
 double PO2_MAX = PO2_MAX_DEFAULT;
 double END_MAX = END_MAX_DEFAULT;
 
+int LAST_STOP_AT_SIX = LAST_STOP_AT_SIX_DEFAULT;
+
 typedef struct zhl_n2_t {
     double t;
     double a[3];
@@ -213,7 +215,12 @@ double round_ceiling(const decostate_t *ds, const double c)
 {
     assert(ds->ceil_multiple != 0);
 
-    return abs_depth(ds->ceil_multiple * ceil(RND(gauge_depth(c) / ds->ceil_multiple)));
+    int numbered_stop = ceil(RND(gauge_depth(c) / ds->ceil_multiple));
+
+    if (numbered_stop == 1 && LAST_STOP_AT_SIX)
+        numbered_stop = 2;
+
+    return abs_depth(ds->ceil_multiple * numbered_stop);
 }
 
 double ceiling(const decostate_t *ds, double gf)
