@@ -8,12 +8,12 @@
 
 #define RND(x) (round((x) *10000) / 10000)
 
-enum ALGO ALGO_VER = ZHL_16C;
-double SURFACE_PRESSURE = 1.01325;
-double P_WV = P_WV_BUHL;
+enum ALGO ALGO_VER = ALGO_VER_DEFAULT;
+double SURFACE_PRESSURE = SURFACE_PRESSURE_DEFAULT;
+double P_WV = P_WV_DEFAULT;
 
-double PO2_MAX = 1.6;
-double END_MAX = 4.01325;
+double PO2_MAX = PO2_MAX_DEFAULT;
+double END_MAX = END_MAX_DEFAULT;
 
 typedef struct zhl_n2_t {
     double t;

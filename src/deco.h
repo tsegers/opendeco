@@ -13,6 +13,13 @@
 #define P_WV_NAVY 0.0567 /* US. Navy value, Rq = 0.9 */
 #define P_WV_SCHR 0.0493 /* Schreiner value, Rq = 0.8, most conservative */
 
+#define ALGO_VER_DEFAULT ZHL_16C
+#define SURFACE_PRESSURE_DEFAULT 1.01325
+#define P_WV_DEFAULT P_WV_BUHL
+
+#define PO2_MAX_DEFAULT 1.6
+#define END_MAX_DEFAULT 4.01325
+
 #define MOD_AUTO 0
 
 /* types */

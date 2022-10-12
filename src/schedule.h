@@ -5,6 +5,8 @@
 
 #include "deco.h"
 
+#define SWITCH_INTERMEDIATE_DEFAULT 1
+
 /* types */
 typedef struct waypoint_t {
     double depth;
