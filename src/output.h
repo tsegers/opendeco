@@ -13,7 +13,7 @@
 #define SWI 0x21BB /* Clockwise Open Circle Arrow */
 
 /* functions */
-void print_planhead();
+void print_planhead(void);
 void print_planline(const wchar_t sign, const double depth, const double time, const double runtime, const gas_t *gas);
 void print_planfoot(const decostate_t *ds);
 

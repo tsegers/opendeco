@@ -52,7 +52,7 @@ void scan_gas(gas_t *gas, char *str)
     *gas = gas_new(o2, he, MOD_AUTO);
 }
 
-void print_planhead()
+void print_planhead(void)
 {
     wprintf(L"DIVE PLAN\n\n");
     wprintf(L" %-1s  %-5s  %-8s  %-7s  %1s %-9s  %-4s  %-3s\n", "", "Depth", "Duration", "Runtime", "", "Gas", "pO2",
