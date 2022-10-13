@@ -57,19 +57,18 @@ int direct_ascent(const decostate_t *ds, const double depth, const double time, 
 void simulate_dive(decostate_t *ds, waypoint_t *waypoints, const int nof_waypoints, waypoint_callback_t wp_cb)
 {
     double depth = abs_depth(0);
-    double runtime = 0;
 
     for (int i = 0; i < nof_waypoints; i++) {
         double d = waypoints[i].depth;
         double t = waypoints[i].time;
         const gas_t *g = waypoints[i].gas;
 
-        if (d != depth) {
-            runtime += add_segment_ascdec(ds, depth, d, t, g);
-            depth = d;
-        } else {
-            runtime += add_segment_const(ds, d, t, g);
-        }
+        if (d != depth)
+            add_segment_ascdec(ds, depth, d, t, g);
+        else
+            add_segment_const(ds, d, t, g);
+
+        depth = d;
 
         if (wp_cb)
             wp_cb(ds, (waypoint_t){.depth = d, .time = t, .gas = g}, SEG_DIVE);
