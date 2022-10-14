@@ -293,6 +293,8 @@ void init_tissues(decostate_t *ds)
 
 void init_decostate(decostate_t *ds, const unsigned char gflo, const unsigned char gfhi, const double ceil_multiple)
 {
+    assert(gflo <= gfhi);
+
     init_tissues(ds);
 
     ds->gflo = gflo;

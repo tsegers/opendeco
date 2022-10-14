@@ -98,6 +98,10 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
             argp_failure(state, 1, 0, "Surface air pressure must be positive. See --help for more information");
             exit(ARGP_ERR_UNKNOWN);
         }
+        if (arguments->gflow > arguments->gfhigh) {
+            argp_failure(state, 1, 0, "GF Low must not be greater than GF High");
+            exit(ARGP_ERR_UNKNOWN);
+        }
     default:
         return ARGP_ERR_UNKNOWN;
     }
