@@ -197,18 +197,19 @@ double get_gf(const decostate_t *ds, const double depth)
     const unsigned char lo = ds->gflo;
     const unsigned char hi = ds->gfhi;
 
+    double last_stop_gauge = LAST_STOP_AT_SIX ? 2 * ds->ceil_multiple : ds->ceil_multiple;
+
     if (ds->firststop == -1)
         return lo;
 
-    if (depth < SURFACE_PRESSURE)
+    if (depth <= SURFACE_PRESSURE + last_stop_gauge)
         return hi;
 
-    if (depth > ds->firststop)
+    if (depth >= ds->firststop)
         return lo;
 
-    /* interpolate lo and hi between first stop and surface */
-    double next_stop = depth - ds->ceil_multiple;
-    return hi - (hi - lo) * gauge_depth(next_stop) / gauge_depth(ds->firststop);
+    /* interpolate lo and hi between first stop and last stop */
+    return hi - (hi - lo) * gauge_depth(depth - ds->ceil_multiple) / gauge_depth(ds->firststop - ds->ceil_multiple);
 }
 
 double round_ceiling(const decostate_t *ds, const double c)
