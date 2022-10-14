@@ -93,9 +93,8 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
             argp_failure(state, 1, 0, "Options -d and -t are required. See --help for more information");
             exit(ARGP_ERR_UNKNOWN);
         }
-        if (arguments->SURFACE_PRESSURE < 0) {
-            argp_state_help(state, stderr, ARGP_HELP_USAGE);
-            argp_failure(state, 1, 0, "Surface air pressure must be positive. See --help for more information");
+        if (arguments->SURFACE_PRESSURE <= 0) {
+            argp_failure(state, 1, 0, "Surface air pressure must be positive");
             exit(ARGP_ERR_UNKNOWN);
         }
         if (arguments->gflow > arguments->gfhigh) {
