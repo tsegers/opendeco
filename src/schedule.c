@@ -77,11 +77,28 @@ void simulate_dive(decostate_t *ds, waypoint_t *waypoints, const int nof_waypoin
 
 double calc_ndl(decostate_t *ds, const double depth, const double ascrate, const gas_t *gas)
 {
-    decostate_t ds_ = *ds;
     double ndl = 0;
 
+    /* rough steps */
+    decostate_t ds_ = *ds;
+
     while (ndl < 360) {
-        double tmp = add_segment_const(&ds_, depth, 1, gas);
+        double tmp = add_segment_const(&ds_, depth, STOPLEN_ROUGH, gas);
+
+        if (!direct_ascent(&ds_, depth, gauge_depth(depth) / ascrate, gas))
+            break;
+
+        ndl += tmp;
+    }
+
+    /* fine steps */
+    ds_ = *ds;
+
+    if (ndl)
+        add_segment_const(&ds_, depth, ndl, gas);
+
+    while (ndl < 360) {
+        double tmp = add_segment_const(&ds_, depth, STOPLEN_FINE, gas);
 
         if (!direct_ascent(&ds_, depth, gauge_depth(depth) / ascrate, gas))
             break;
