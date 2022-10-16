@@ -33,12 +33,14 @@ static struct argp_option options[] = {
     {"time",       't', "NUMBER", 0,                   "Set the time of the dive in minutes",                          1},
     {"gas",        'g', "STRING", 0,                   "Set the bottom gas used during the dive, defaults to Air",     2},
     {"pressure",   'p', "NUMBER", 0,                   "Set the surface air pressure, defaults to 1.01325bar or 1atm", 3},
+
     {0,            0,   0,        0,                   "Deco options:",                                                0},
     {"gflow",      'l', "NUMBER", 0,                   "Set the gradient factor at the first stop, defaults to 30",    4},
     {"gfhigh",     'h', "NUMBER", 0,                   "Set the gradient factor at the surface, defaults to 75",       5},
     {"decogasses", 'G', "LIST",   0,                   "Set the gasses available for deco",                            6},
     {0,            's', 0,        OPTION_ARG_OPTIONAL, "Only switch gas at deco stops",                                7},
     {0,            '6', 0,        OPTION_ARG_OPTIONAL, "Perform last deco stop at 6m",                                 8},
+
     {0,            0,   0,        0,                   "Informational options:",                                       0},
     {0,            0,   0,        0,                   0,                                                              0}
 };
@@ -108,8 +110,6 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
     return 0;
 }
 
-static struct argp argp = {options, parse_opt, args_doc, doc, 0, 0, 0};
-
 void print_segment_callback(const decostate_t *ds, const waypoint_t wp, segtype_t type)
 {
     static double last_depth;
@@ -153,7 +153,7 @@ int parse_gasses(gas_t **gasses, char *str)
     char *gas_str = NULL;
     int gas_idx = 0;
 
-    while (1) {
+    for (;;) {
         if (!gas_str)
             gas_str = strtok(str, ",");
         else
@@ -175,6 +175,8 @@ int main(int argc, char *argv[])
     setlocale(LC_ALL, "en_US.utf8");
 
     /* argp */
+    static struct argp argp = {options, parse_opt, args_doc, doc, 0, 0, 0};
+
     struct arguments arguments = {
         .depth = -1,
         .time = -1,
