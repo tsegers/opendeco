@@ -92,10 +92,12 @@ double calc_ndl(decostate_t *ds, const double depth, const double ascrate, const
     return ndl;
 }
 
-double calc_stoplen_rough(const decostate_t *ds, const double depth, const double current_gf, const gas_t *gas)
+double deco_stop(decostate_t *ds, const double depth, const double current_gf, const gas_t *gas)
 {
-    decostate_t ds_ = *ds;
     double stoplen = 0;
+
+    /* rough steps */
+    decostate_t ds_ = *ds;
 
     for (;;) {
         double tmp = add_segment_const(&ds_, depth, STOPLEN_ROUGH, gas);
@@ -106,20 +108,8 @@ double calc_stoplen_rough(const decostate_t *ds, const double depth, const doubl
         stoplen += tmp;
     }
 
-    return stoplen;
-}
-
-double deco_stop(decostate_t *ds, const double depth, const double current_gf, const gas_t *gas)
-{
-    double stoplen = 0;
-
-    /* rough steps */
-    double stoplen_rough = calc_stoplen_rough(ds, depth, current_gf, gas);
-
-    if (stoplen_rough) {
-        add_segment_const(ds, depth, stoplen_rough, gas);
-        stoplen += stoplen_rough;
-    }
+    if (stoplen)
+        add_segment_const(ds, depth, stoplen, gas);
 
     /* fine steps */
     while (ceiling(ds, current_gf) == depth)
