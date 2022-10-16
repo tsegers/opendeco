@@ -197,7 +197,7 @@ double get_gf(const decostate_t *ds, const double depth)
     const unsigned char lo = ds->gflo;
     const unsigned char hi = ds->gfhi;
 
-    double last_stop_gauge = LAST_STOP_AT_SIX ? 2 * ds->ceil_multiple : ds->ceil_multiple;
+    const double last_stop_gauge = LAST_STOP_AT_SIX ? msw_to_bar(6) : ds->ceil_multiple;
 
     if (ds->firststop == -1)
         return lo;
@@ -216,12 +216,12 @@ double round_ceiling(const decostate_t *ds, const double c)
 {
     assert(ds->ceil_multiple != 0);
 
-    int numbered_stop = ceil(RND(gauge_depth(c) / ds->ceil_multiple));
+    double ceil_gauge = ds->ceil_multiple * ceil(RND(gauge_depth(c) / ds->ceil_multiple));
 
-    if (numbered_stop == 1 && LAST_STOP_AT_SIX)
-        numbered_stop = 2;
-
-    return abs_depth(ds->ceil_multiple * numbered_stop);
+    if (LAST_STOP_AT_SIX && ceil_gauge < msw_to_bar(6) && ceil_gauge > 0)
+        return abs_depth(msw_to_bar(6));
+    else
+        return abs_depth(ceil_gauge);
 }
 
 double ceiling(const decostate_t *ds, double gf)
