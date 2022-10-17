@@ -1,19 +1,20 @@
-VERSION=\"$(shell git describe --tags --dirty)\"
-
 PREFIX = /usr/local
+
+VERSION = \"$(shell git describe --tags --dirty)\"
+CFLAGS = --std=c99 -pedantic -Wall -Werror -Os -DVERSION=${VERSION}
 
 all: opendeco opendeco_test libopendeco.a
 
 opendeco: src/opendeco.c src/deco.c src/deco.h src/schedule.c src/schedule.h src/output.c src/output.h
-	gcc --std=c99 -pedantic -Wall -Werror -O3 -DVERSION=${VERSION} src/opendeco.c src/deco.c src/schedule.c src/output.c -lm -o opendeco
+	$(CC) $(CFLAGS) src/opendeco.c src/deco.c src/schedule.c src/output.c -lm -o opendeco
 
 opendeco_test: test/opendeco_test.c test/deco_test.c src/deco.c 
-	gcc --std=c99 -pedantic -Wall -Werror -O3 test/minunit.c test/opendeco_test.c test/deco_test.c src/deco.c -lm -o opendeco_test
+	$(CC) $(CFLAGS) test/minunit.c test/opendeco_test.c test/deco_test.c src/deco.c -lm -o opendeco_test
 
 libopendeco.a:
-	gcc -c src/deco.c -o src/deco.o
-	gcc -c src/schedule.c -o src/schedule.o
-	gcc -c src/output.c -o src/output.o
+	$(CC) -c src/deco.c -o src/deco.o
+	$(CC) -c src/schedule.c -o src/schedule.o
+	$(CC) -c src/output.c -o src/output.o
 	ar rs libopendeco.a src/deco.o src/schedule.o src/output.o
 
 lib: libopendeco.a
