@@ -75,7 +75,6 @@ double add_segment_ascdec(decostate_t *ds, const double dstart, const double den
                           const gas_t *gas);
 double add_segment_const(decostate_t *ds, const double depth, const double time, const gas_t *gas);
 double get_gf(const decostate_t *ds, const double depth);
-double round_ceiling(const decostate_t *ds, const double c);
 double ceiling(const decostate_t *ds, double gf);
 double gf99(const decostate_t *ds, double depth);
 

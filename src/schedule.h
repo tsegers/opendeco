@@ -36,7 +36,6 @@ extern int SWITCH_INTERMEDIATE;
 typedef void (*waypoint_callback_t)(const decostate_t *ds, const waypoint_t, const segtype_t);
 
 const gas_t *best_gas(const double depth, const gas_t *gasses, const int nof_gasses);
-const gas_t *next_gas(const double depth, const gas_t *gasses, const int nof_gasses);
 
 int direct_ascent(const decostate_t *ds, const double depth, const double time, const gas_t *gas);
 double calc_ndl(decostate_t *ds, const double depth, const double ascrate, const gas_t *gas);
