@@ -195,6 +195,10 @@ decoinfo_t calc_deco(decostate_t *ds, const double start_depth, const gas_t *sta
              * get_gf, the result was inaccurate and needs to be recalculated
              */
             current_gf = get_gf(ds, next_stop);
+
+            /* if the new gf also allows us to ascend further, continue ascending */
+            if (ceiling(ds, current_gf) < next_stop)
+                continue;
         }
 
         /* emit waypoint */
