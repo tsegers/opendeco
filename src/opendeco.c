@@ -174,7 +174,7 @@ void print_gas_use()
     }
 }
 
-void print_segment_callback(const decostate_t *ds, const waypoint_t wp, segtype_t type)
+void print_segment_callback_fn(const decostate_t *ds, const waypoint_t wp, segtype_t type, void *arg)
 {
     static double last_depth;
     static double runtime;
@@ -297,6 +297,11 @@ int main(int argc, char *argv[])
     waypoint_t waypoints[] = {
         {.depth = abs_depth(msw_to_bar(arguments.depth)), .time = descent_time, &bottom_gas},
         {.depth = abs_depth(msw_to_bar(arguments.depth)), .time = bottom_time,  &bottom_gas},
+    };
+
+    waypoint_callback_t print_segment_callback = {
+        .fn = &print_segment_callback_fn,
+        .arg = NULL,
     };
 
     print_planhead();

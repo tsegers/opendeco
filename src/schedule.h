@@ -29,20 +29,23 @@ typedef enum segtype_t {
     SEG_TRAVEL,
 } segtype_t;
 
+typedef struct waypoint_callback_t {
+    void (*fn)(const decostate_t *ds, const waypoint_t, const segtype_t, void *arg);
+    void *arg;
+} waypoint_callback_t;
+
 /* global variables */
 extern int SWITCH_INTERMEDIATE;
 
 /* functions */
-typedef void (*waypoint_callback_t)(const decostate_t *ds, const waypoint_t, const segtype_t);
-
 const gas_t *best_gas(const double depth, const gas_t *gasses, const int nof_gasses);
 
 int direct_ascent(const decostate_t *ds, const double depth, const double time, const gas_t *gas);
 double calc_ndl(decostate_t *ds, const double depth, const double ascrate, const gas_t *gas);
 
-void simulate_dive(decostate_t *ds, waypoint_t *waypoints, const int nof_waypoints, waypoint_callback_t wp_cb);
+void simulate_dive(decostate_t *ds, waypoint_t *waypoints, const int nof_waypoints, waypoint_callback_t *wp_cb);
 
 decoinfo_t calc_deco(decostate_t *ds, const double start_depth, const gas_t *start_gas, const gas_t *deco_gasses,
-                     const int nof_gasses, waypoint_callback_t wp_cb);
+                     const int nof_gasses, waypoint_callback_t *wp_cb);
 
 #endif /* end of include guard: SCHEDULE_H */
