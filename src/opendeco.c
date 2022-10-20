@@ -159,7 +159,7 @@ int register_gas_use(const double depth, const double time, const gas_t *gas, co
     return -1;
 }
 
-void print_gas_use()
+void print_gas_use(void)
 {
     static char gasbuf[12];
 
