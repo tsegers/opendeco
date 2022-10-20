@@ -13,9 +13,15 @@
 
 #define MOD_OXY (abs_depth(msw_to_bar(6)))
 
+#define RMV_DIVE_DEFAULT 20
+#define RMV_DECO_DEFAULT 15
+
 #ifndef VERSION
 #define VERSION "unknown version"
 #endif
+
+double RMV_DIVE = RMV_DIVE_DEFAULT;
+double RMV_DECO = RMV_DECO_DEFAULT;
 
 /* argp settings */
 static char args_doc[] = "";
@@ -28,21 +34,23 @@ const char *argp_program_bug_address = "<~tsegers/opendeco@lists.sr.ht> or https
 const char *argp_program_version = "opendeco " VERSION;
 
 static struct argp_option options[] = {
-    {0,            0,   0,        0,                   "Dive options:",                                                0},
-    {"depth",      'd', "NUMBER", 0,                   "Set the depth of the dive in meters",                          0},
-    {"time",       't', "NUMBER", 0,                   "Set the time of the dive in minutes",                          1},
-    {"gas",        'g', "STRING", 0,                   "Set the bottom gas used during the dive, defaults to Air",     2},
-    {"pressure",   'p', "NUMBER", 0,                   "Set the surface air pressure, defaults to 1.01325bar or 1atm", 3},
+    {0,            0,   0,        0,                   "Dive options:",                                                   0 },
+    {"depth",      'd', "NUMBER", 0,                   "Set the depth of the dive in meters",                             0 },
+    {"time",       't', "NUMBER", 0,                   "Set the time of the dive in minutes",                             1 },
+    {"gas",        'g', "STRING", 0,                   "Set the bottom gas used during the dive, defaults to Air",        2 },
+    {"pressure",   'p', "NUMBER", 0,                   "Set the surface air pressure, defaults to 1.01325bar or 1atm",    3 },
+    {"rmv",        'r', "NUMBER", 0,                   "Set the RMV during the dive portion of the dive, defaults to 20", 4 },
 
-    {0,            0,   0,        0,                   "Deco options:",                                                0},
-    {"gflow",      'l', "NUMBER", 0,                   "Set the gradient factor at the first stop, defaults to 30",    4},
-    {"gfhigh",     'h', "NUMBER", 0,                   "Set the gradient factor at the surface, defaults to 75",       5},
-    {"decogasses", 'G', "LIST",   0,                   "Set the gasses available for deco",                            6},
-    {0,            's', 0,        OPTION_ARG_OPTIONAL, "Only switch gas at deco stops",                                7},
-    {0,            '6', 0,        OPTION_ARG_OPTIONAL, "Perform last deco stop at 6m",                                 8},
+    {0,            0,   0,        0,                   "Deco options:",                                                   0 },
+    {"gflow",      'l', "NUMBER", 0,                   "Set the gradient factor at the first stop, defaults to 30",       5 },
+    {"gfhigh",     'h', "NUMBER", 0,                   "Set the gradient factor at the surface, defaults to 75",          6 },
+    {"decogasses", 'G', "LIST",   0,                   "Set the gasses available for deco",                               7 },
+    {0,            's', 0,        OPTION_ARG_OPTIONAL, "Only switch gas at deco stops",                                   8 },
+    {0,            '6', 0,        OPTION_ARG_OPTIONAL, "Perform last deco stop at 6m",                                    9 },
+    {"decormv",    'R', "NUMBER", 0,                   "Set the RMV during the deco portion of the dive, defaults to 15", 10},
 
-    {0,            0,   0,        0,                   "Informational options:",                                       0},
-    {0,            0,   0,        0,                   0,                                                              0}
+    {0,            0,   0,        0,                   "Informational options:",                                          0 },
+    {0,            0,   0,        0,                   0,                                                                 0 }
 };
 
 struct arguments {
@@ -55,6 +63,8 @@ struct arguments {
     double SURFACE_PRESSURE;
     int SWITCH_INTERMEDIATE;
     int LAST_STOP_AT_SIX;
+    double RMV_DIVE;
+    double RMV_DECO;
 };
 
 static error_t parse_opt(int key, char *arg, struct argp_state *state)
@@ -80,6 +90,9 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
     case '6':
         arguments->LAST_STOP_AT_SIX = 1;
         break;
+    case 'r':
+        arguments->RMV_DIVE = arg ? atof(arg) : -1;
+        break;
     case 'G':
         arguments->decogasses = arg;
         break;
@@ -88,6 +101,9 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
         break;
     case 'h':
         arguments->gfhigh = arg ? atoi(arg) : 100;
+        break;
+    case 'R':
+        arguments->RMV_DECO = arg ? atof(arg) : -1;
         break;
     case ARGP_KEY_END:
         if (arguments->depth < 0 || arguments->time < 0) {
@@ -103,11 +119,59 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
             argp_failure(state, 1, 0, "GF Low must not be greater than GF High");
             exit(ARGP_ERR_UNKNOWN);
         }
+        if (arguments->RMV_DIVE <= 0) {
+            argp_failure(state, 1, 0, "Dive RMV must be greater than 0");
+            exit(ARGP_ERR_UNKNOWN);
+        }
+        if (arguments->RMV_DECO <= 0) {
+            argp_failure(state, 1, 0, "Deco RMV must be greater than 0");
+            exit(ARGP_ERR_UNKNOWN);
+        }
     default:
         return ARGP_ERR_UNKNOWN;
     }
 
     return 0;
+}
+
+static struct gas_usage {
+    const gas_t *gas;
+    double usage;
+} gas_usage[10];
+
+int register_gas_use(const double depth, const double time, const gas_t *gas, const double rmv)
+{
+    double usage = depth * time * rmv;
+
+    for (int i = 0; i < 10; i++) {
+        if (!gas_usage[i].gas) {
+            gas_usage[i] = (struct gas_usage){
+                .gas = gas,
+                .usage = usage,
+            };
+            return 0;
+        } else if (gas_usage[i].gas == gas) {
+            gas_usage[i].usage += usage;
+            return 0;
+        }
+    }
+
+    return -1;
+}
+
+void print_gas_use()
+{
+    static char gasbuf[12];
+
+    wprintf(L"\n");
+
+    for (int i = 0; i < 10; i++) {
+        if (gas_usage[i].gas) {
+            format_gas(gasbuf, len(gasbuf), gas_usage[i].gas);
+            strcat(gasbuf, ":");
+            wprintf(L"%-12s%5i%lc\n", gasbuf, (int) ceil(gas_usage[i].usage), LTR);
+        }
+    }
 }
 
 void print_segment_callback(const decostate_t *ds, const waypoint_t wp, segtype_t type)
@@ -116,6 +180,10 @@ void print_segment_callback(const decostate_t *ds, const waypoint_t wp, segtype_
     static double runtime;
 
     wchar_t sign;
+
+    /* first time initialization */
+    if (!last_depth)
+        last_depth = SURFACE_PRESSURE;
 
     runtime += wp.time;
 
@@ -128,6 +196,12 @@ void print_segment_callback(const decostate_t *ds, const waypoint_t wp, segtype_
 
     if (type != SEG_TRAVEL)
         print_planline(sign, wp.depth, wp.time, runtime, wp.gas);
+
+    /* register gas use */
+    double avg_seg_depth = wp.depth == last_depth ? last_depth : (wp.depth + last_depth) / 2;
+    double rmv = type == SEG_DIVE ? RMV_DIVE : RMV_DECO;
+
+    register_gas_use(avg_seg_depth, wp.time, wp.gas, rmv);
 
     last_depth = wp.depth;
 }
@@ -187,6 +261,8 @@ int main(int argc, char *argv[])
         .SURFACE_PRESSURE = SURFACE_PRESSURE_DEFAULT,
         .SWITCH_INTERMEDIATE = SWITCH_INTERMEDIATE_DEFAULT,
         .LAST_STOP_AT_SIX = LAST_STOP_AT_SIX_DEFAULT,
+        .RMV_DIVE = RMV_DIVE_DEFAULT,
+        .RMV_DECO = RMV_DECO_DEFAULT,
     };
 
     argp_parse(&argp, argc, argv, 0, 0, &arguments);
@@ -195,6 +271,8 @@ int main(int argc, char *argv[])
     SURFACE_PRESSURE = arguments.SURFACE_PRESSURE;
     SWITCH_INTERMEDIATE = arguments.SWITCH_INTERMEDIATE;
     LAST_STOP_AT_SIX = arguments.LAST_STOP_AT_SIX;
+    RMV_DIVE = arguments.RMV_DIVE;
+    RMV_DECO = arguments.RMV_DECO;
 
     /* setup */
     decostate_t ds;
@@ -237,6 +315,7 @@ int main(int argc, char *argv[])
     decoinfo_t di = calc_deco(&ds, depth, gas, deco_gasses, nof_gasses, &print_segment_callback);
 
     /* output deco info and disclaimer */
+    print_gas_use();
     wprintf(L"\nNDL: %i TTS: %i TTS @+5: %i\n", (int) floor(di.ndl), (int) ceil(di.tts), (int) ceil(di_plus5.tts));
     print_planfoot(&ds);
 
