@@ -16,6 +16,9 @@ Implementation of Buhlmann ZH-L16 with Gradient Factors:
   -p, --pressure=NUMBER      Set the surface air pressure, defaults to
                              1.01325bar or 1atm
 
+  -r, --rmv=NUMBER           Set the RMV during the dive portion of the dive,
+                             defaults to 20
+
  Deco options:
   -l, --gflow=NUMBER         Set the gradient factor at the first stop,
                              defaults to 30
@@ -28,6 +31,9 @@ Implementation of Buhlmann ZH-L16 with Gradient Factors:
   -s                         Only switch gas at deco stops
 
   -6                         Perform last deco stop at 6m
+
+  -R, --decormv=NUMBER       Set the RMV during the deco portion of the dive,
+                             defaults to 15
 
  Informational options:
 
