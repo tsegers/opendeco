@@ -10,7 +10,7 @@
 
 int SWITCH_INTERMEDIATE = SWITCH_INTERMEDIATE_DEFAULT;
 
-const gas_t *best_gas(const double depth, const gas_t *gasses, const int nof_gasses)
+const gas_t *best_gas(double depth, const gas_t *gasses, int nof_gasses)
 {
     const gas_t *best = NULL;
     double mod_best = -1;
@@ -27,7 +27,7 @@ const gas_t *best_gas(const double depth, const gas_t *gasses, const int nof_gas
     return best;
 }
 
-int direct_ascent(const decostate_t *ds, const double depth, const double time, const gas_t *gas)
+int direct_ascent(const decostate_t *ds, double depth, double time, const gas_t *gas)
 {
     decostate_t ds_ = *ds;
     assert(ds_.firststop == -1);
@@ -37,7 +37,7 @@ int direct_ascent(const decostate_t *ds, const double depth, const double time, 
     return gauge_depth(ceiling(&ds_, ds_.gfhi)) <= 0;
 }
 
-void simulate_dive(decostate_t *ds, waypoint_t *waypoints, const int nof_waypoints, waypoint_callback_t *wp_cb)
+void simulate_dive(decostate_t *ds, const waypoint_t *waypoints, int nof_waypoints, const waypoint_callback_t *wp_cb)
 {
     double depth = abs_depth(0);
 
@@ -58,7 +58,7 @@ void simulate_dive(decostate_t *ds, waypoint_t *waypoints, const int nof_waypoin
     }
 }
 
-double calc_ndl(decostate_t *ds, const double depth, const double ascrate, const gas_t *gas)
+double calc_ndl(decostate_t *ds, double depth, double ascrate, const gas_t *gas)
 {
     double ndl = 0;
 
@@ -92,8 +92,7 @@ double calc_ndl(decostate_t *ds, const double depth, const double ascrate, const
     return ndl;
 }
 
-double deco_stop(decostate_t *ds, const double depth, const double next_stop, const double current_gf,
-                 const gas_t *gas)
+double deco_stop(decostate_t *ds, double depth, double next_stop, double current_gf, const gas_t *gas)
 {
     double stoplen = 0;
 
@@ -119,13 +118,13 @@ double deco_stop(decostate_t *ds, const double depth, const double next_stop, co
     return stoplen;
 }
 
-static int surfaced(const double depth)
+static int surfaced(double depth)
 {
     return fabs(depth - SURFACE_PRESSURE) < 1E-2;
 }
 
-decoinfo_t calc_deco(decostate_t *ds, const double start_depth, const gas_t *start_gas, const gas_t *deco_gasses,
-                     const int nof_gasses, waypoint_callback_t *wp_cb)
+decoinfo_t calc_deco(decostate_t *ds, double start_depth, const gas_t *start_gas, const gas_t *deco_gasses,
+                     int nof_gasses, const waypoint_callback_t *wp_cb)
 {
     decoinfo_t ret = {.tts = 0, .ndl = 0};
 

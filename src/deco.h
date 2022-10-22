@@ -59,26 +59,25 @@ extern double END_MAX;
 extern int LAST_STOP_AT_SIX;
 
 /* functions */
-double bar_to_msw(const double bar);
-double msw_to_bar(const double msw);
-double abs_depth(const double gd);
-double gauge_depth(const double ad);
+double bar_to_msw(double bar);
+double msw_to_bar(double msw);
+double abs_depth(double gd);
+double gauge_depth(double ad);
 
-gas_t gas_new(const unsigned char o2, const unsigned char he, double mod);
+gas_t gas_new(unsigned char o2, unsigned char he, double mod);
 int gas_equal(const gas_t *g1, const gas_t *g2);
 unsigned char gas_o2(const gas_t *gas);
 unsigned char gas_he(const gas_t *gas);
 unsigned char gas_n2(const gas_t *gas);
 double gas_mod(const gas_t *gas);
 
-double add_segment_ascdec(decostate_t *ds, const double dstart, const double dend, const double time,
-                          const gas_t *gas);
-double add_segment_const(decostate_t *ds, const double depth, const double time, const gas_t *gas);
-double get_gf(const decostate_t *ds, const double depth);
+double add_segment_ascdec(decostate_t *ds, double dstart, double dend, double time, const gas_t *gas);
+double add_segment_const(decostate_t *ds, double depth, double time, const gas_t *gas);
+double get_gf(const decostate_t *ds, double depth);
 double ceiling(const decostate_t *ds, double gf);
 double gf99(const decostate_t *ds, double depth);
 
-void init_decostate(decostate_t *ds, const unsigned char gflo, const unsigned char gfhi, const double ceil_multiple);
+void init_decostate(decostate_t *ds, unsigned char gflo, unsigned char gfhi, double ceil_multiple);
 
 double ppO2(double depth, const gas_t *gas);
 double end(double depth, const gas_t *gas);

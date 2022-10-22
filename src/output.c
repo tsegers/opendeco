@@ -6,7 +6,7 @@
 
 #include "output.h"
 
-void format_mm_ss(char *buf, const size_t buflen, const double time)
+void format_mm_ss(char *buf, size_t buflen, double time)
 {
     double mm;
     double ss = round(modf(time, &mm) * 60);
@@ -18,7 +18,7 @@ void format_mm_ss(char *buf, const size_t buflen, const double time)
     snprintf(buf, buflen, "%3i:%02i", (int) mm, (int) ss);
 }
 
-void format_gas(char *buf, const size_t buflen, const gas_t *gas)
+void format_gas(char *buf, size_t buflen, const gas_t *gas)
 {
     if (gas_o2(gas) == 21 && gas_he(gas) == 0)
         snprintf(buf, buflen, "Air");
@@ -59,7 +59,7 @@ void print_planhead(void)
             "EAD");
 }
 
-void print_planline(const wchar_t sign, const double depth, const double time, const double runtime, const gas_t *gas)
+void print_planline(wchar_t sign, double depth, double time, double runtime, const gas_t *gas)
 {
     static char gasbuf[11];
     static char runbuf[8];

@@ -67,27 +67,27 @@ const zhl_he_t ZHL16He[] = {
     {.t = 240.03, .a = 0.5119, .b = 0.9267},
 };
 
-double bar_to_msw(const double bar)
+double bar_to_msw(double bar)
 {
     return bar * 10;
 }
 
-double msw_to_bar(const double msw)
+double msw_to_bar(double msw)
 {
     return msw / 10;
 }
 
-double abs_depth(const double gd)
+double abs_depth(double gd)
 {
     return gd + SURFACE_PRESSURE;
 }
 
-double gauge_depth(const double ad)
+double gauge_depth(double ad)
 {
     return ad - SURFACE_PRESSURE;
 }
 
-gas_t gas_new(const unsigned char o2, const unsigned char he, double mod)
+gas_t gas_new(unsigned char o2, unsigned char he, double mod)
 {
     assert(o2 + he <= 100);
 
@@ -126,7 +126,7 @@ double gas_mod(const gas_t *gas)
     return gas->mod;
 }
 
-double add_segment_ascdec(decostate_t *ds, const double dstart, const double dend, const double time, const gas_t *gas)
+double add_segment_ascdec(decostate_t *ds, double dstart, double dend, double time, const gas_t *gas)
 {
     assert(time > 0);
 
@@ -161,7 +161,7 @@ double add_segment_ascdec(decostate_t *ds, const double dstart, const double den
     return time;
 }
 
-double add_segment_const(decostate_t *ds, const double depth, const double time, const gas_t *gas)
+double add_segment_const(decostate_t *ds, double depth, double time, const gas_t *gas)
 {
     assert(time > 0);
 
@@ -192,7 +192,7 @@ double add_segment_const(decostate_t *ds, const double depth, const double time,
     return time;
 }
 
-double get_gf(const decostate_t *ds, const double depth)
+double get_gf(const decostate_t *ds, double depth)
 {
     const unsigned char lo = ds->gflo;
     const unsigned char hi = ds->gfhi;
@@ -277,7 +277,7 @@ void init_tissues(decostate_t *ds)
         ds->phe[i] = phe;
 }
 
-void init_decostate(decostate_t *ds, const unsigned char gflo, const unsigned char gfhi, const double ceil_multiple)
+void init_decostate(decostate_t *ds, unsigned char gflo, unsigned char gfhi, double ceil_multiple)
 {
     assert(gflo <= gfhi);
 

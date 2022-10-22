@@ -15,10 +15,10 @@
 
 /* functions */
 void print_planhead(void);
-void print_planline(const wchar_t sign, const double depth, const double time, const double runtime, const gas_t *gas);
+void print_planline(wchar_t sign, double depth, double time, double runtime, const gas_t *gas);
 void print_planfoot(const decostate_t *ds);
 
 void scan_gas(gas_t *gas, char *str);
-void format_gas(char *buf, const size_t buflen, const gas_t *gas);
+void format_gas(char *buf, size_t buflen, const gas_t *gas);
 
 #endif /* end of include guard: OUTPUT_H */

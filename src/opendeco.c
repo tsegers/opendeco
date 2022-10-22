@@ -139,7 +139,7 @@ static struct gas_usage {
     double usage;
 } gas_usage[10];
 
-int register_gas_use(const double depth, const double time, const gas_t *gas, const double rmv)
+int register_gas_use(double depth, double time, const gas_t *gas, double rmv)
 {
     double usage = depth * time * rmv;
 
@@ -174,7 +174,7 @@ void print_gas_use(void)
     }
 }
 
-void print_segment_callback_fn(const decostate_t *ds, const waypoint_t wp, segtype_t type, void *arg)
+void print_segment_callback_fn(const decostate_t *ds, waypoint_t wp, segtype_t type, void *arg)
 {
     static double last_depth;
     static double runtime;
