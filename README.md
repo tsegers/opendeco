@@ -35,6 +35,8 @@ Implementation of Buhlmann ZH-L16 with Gradient Factors:
   -R, --decormv=NUMBER       Set the RMV during the deco portion of the dive,
                              defaults to 15
 
+  -T, --showtravel           Show travel segments in deco plan
+
  Informational options:
 
   -?, --help                 Give this help list

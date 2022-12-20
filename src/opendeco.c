@@ -15,6 +15,7 @@
 
 #define RMV_DIVE_DEFAULT 20
 #define RMV_DECO_DEFAULT 15
+#define SHOW_TRAVEL_DEFAULT 0
 
 #ifndef VERSION
 #define VERSION "unknown version"
@@ -22,6 +23,8 @@
 
 double RMV_DIVE = RMV_DIVE_DEFAULT;
 double RMV_DECO = RMV_DECO_DEFAULT;
+
+int SHOW_TRAVEL = SHOW_TRAVEL_DEFAULT;
 
 /* argp settings */
 static char args_doc[] = "";
@@ -48,6 +51,7 @@ static struct argp_option options[] = {
     {0,            's', 0,        OPTION_ARG_OPTIONAL, "Only switch gas at deco stops",                                   8 },
     {0,            '6', 0,        OPTION_ARG_OPTIONAL, "Perform last deco stop at 6m",                                    9 },
     {"decormv",    'R', "NUMBER", 0,                   "Set the RMV during the deco portion of the dive, defaults to 15", 10},
+    {"showtravel", 'T', 0,        0,                   "Show travel segments in deco plan",                               11},
 
     {0,            0,   0,        0,                   "Informational options:",                                          0 },
     {0,            0,   0,        0,                   0,                                                                 0 }
@@ -65,6 +69,7 @@ struct arguments {
     int LAST_STOP_AT_SIX;
     double RMV_DIVE;
     double RMV_DECO;
+    int SHOW_TRAVEL;
 };
 
 static error_t parse_opt(int key, char *arg, struct argp_state *state)
@@ -84,17 +89,8 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
     case 'p':
         arguments->SURFACE_PRESSURE = arg ? atof(arg) : -1;
         break;
-    case 's':
-        arguments->SWITCH_INTERMEDIATE = 0;
-        break;
-    case '6':
-        arguments->LAST_STOP_AT_SIX = 1;
-        break;
     case 'r':
         arguments->RMV_DIVE = arg ? atof(arg) : -1;
-        break;
-    case 'G':
-        arguments->decogasses = arg;
         break;
     case 'l':
         arguments->gflow = arg ? atoi(arg) : 100;
@@ -102,8 +98,20 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
     case 'h':
         arguments->gfhigh = arg ? atoi(arg) : 100;
         break;
+    case 'G':
+        arguments->decogasses = arg;
+        break;
+    case 's':
+        arguments->SWITCH_INTERMEDIATE = 0;
+        break;
+    case '6':
+        arguments->LAST_STOP_AT_SIX = 1;
+        break;
     case 'R':
         arguments->RMV_DECO = arg ? atof(arg) : -1;
+        break;
+    case 'T':
+        arguments->SHOW_TRAVEL = 1;
         break;
     case ARGP_KEY_END:
         if (arguments->depth < 0 || arguments->time < 0) {
@@ -194,7 +202,7 @@ void print_segment_callback_fn(const decostate_t *ds, waypoint_t wp, segtype_t t
     else
         sign = LVL;
 
-    if (type != SEG_TRAVEL)
+    if (SHOW_TRAVEL || type != SEG_TRAVEL)
         print_planline(sign, wp.depth, wp.time, runtime, wp.gas);
 
     /* register gas use */
@@ -263,6 +271,7 @@ int main(int argc, char *argv[])
         .LAST_STOP_AT_SIX = LAST_STOP_AT_SIX_DEFAULT,
         .RMV_DIVE = RMV_DIVE_DEFAULT,
         .RMV_DECO = RMV_DECO_DEFAULT,
+        .SHOW_TRAVEL = SHOW_TRAVEL_DEFAULT,
     };
 
     argp_parse(&argp, argc, argv, 0, 0, &arguments);
@@ -273,6 +282,7 @@ int main(int argc, char *argv[])
     LAST_STOP_AT_SIX = arguments.LAST_STOP_AT_SIX;
     RMV_DIVE = arguments.RMV_DIVE;
     RMV_DECO = arguments.RMV_DECO;
+    SHOW_TRAVEL = arguments.SHOW_TRAVEL;
 
     /* setup */
     decostate_t ds;
