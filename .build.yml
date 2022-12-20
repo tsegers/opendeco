@@ -2,8 +2,6 @@ image: debian/stable
 packages:
   - build-essential
   - clang-format-13
-sources:
-  - https://git.sr.ht/~tsegers/opendeco
 tasks:
   - check-format: |
       cd opendeco
