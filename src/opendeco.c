@@ -32,7 +32,7 @@ static char doc[] = "Implementation of Buhlmann ZH-L16 with Gradient Factors:"
                     "\vExamples:\n\n"
                     "  ./opendeco -d 18 -t 60 -g Air\n"
                     "  ./opendeco -d 30 -t 60 -g EAN32\n"
-                    "  ./opendeco -d 40 -t 120 -g 21/35 -l 20 -h 80 --decogasses Oxygen,EAN50\n";
+                    "  ./opendeco -d 40 -t 120 -g 21/35 -L 20 -H 80 --decogasses Oxygen,EAN50\n";
 const char *argp_program_bug_address = "<~tsegers/opendeco@lists.sr.ht> or https://todo.sr.ht/~tsegers/opendeco";
 const char *argp_program_version = "opendeco " VERSION;
 
@@ -45,10 +45,10 @@ static struct argp_option options[] = {
     {"rmv",        'r', "NUMBER", 0,                   "Set the RMV during the dive portion of the dive, defaults to 20", 4 },
 
     {0,            0,   0,        0,                   "Deco options:",                                                   0 },
-    {"gflow",      'l', "NUMBER", 0,                   "Set the gradient factor at the first stop, defaults to 30",       5 },
-    {"gfhigh",     'h', "NUMBER", 0,                   "Set the gradient factor at the surface, defaults to 75",          6 },
+    {"gflow",      'L', "NUMBER", 0,                   "Set the gradient factor at the first stop, defaults to 30",       5 },
+    {"gfhigh",     'H', "NUMBER", 0,                   "Set the gradient factor at the surface, defaults to 75",          6 },
     {"decogasses", 'G', "LIST",   0,                   "Set the gasses available for deco",                               7 },
-    {0,            's', 0,        OPTION_ARG_OPTIONAL, "Only switch gas at deco stops",                                   8 },
+    {0,            'S', 0,        OPTION_ARG_OPTIONAL, "Only switch gas at deco stops",                                   8 },
     {0,            '6', 0,        OPTION_ARG_OPTIONAL, "Perform last deco stop at 6m",                                    9 },
     {"decormv",    'R', "NUMBER", 0,                   "Set the RMV during the deco portion of the dive, defaults to 15", 10},
     {"showtravel", 'T', 0,        0,                   "Show travel segments in deco plan",                               11},
@@ -92,16 +92,16 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
     case 'r':
         arguments->RMV_DIVE = arg ? atof(arg) : -1;
         break;
-    case 'l':
+    case 'L':
         arguments->gflow = arg ? atoi(arg) : 100;
         break;
-    case 'h':
+    case 'H':
         arguments->gfhigh = arg ? atoi(arg) : 100;
         break;
     case 'G':
         arguments->decogasses = arg;
         break;
-    case 's':
+    case 'S':
         arguments->SWITCH_INTERMEDIATE = 0;
         break;
     case '6':

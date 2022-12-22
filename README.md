@@ -20,15 +20,15 @@ Implementation of Buhlmann ZH-L16 with Gradient Factors:
                              defaults to 20
 
  Deco options:
-  -l, --gflow=NUMBER         Set the gradient factor at the first stop,
+  -L, --gflow=NUMBER         Set the gradient factor at the first stop,
                              defaults to 30
 
-  -h, --gfhigh=NUMBER        Set the gradient factor at the surface, defaults
+  -H, --gfhigh=NUMBER        Set the gradient factor at the surface, defaults
                              to 75
 
   -G, --decogasses=LIST      Set the gasses available for deco
 
-  -s                         Only switch gas at deco stops
+  -S                         Only switch gas at deco stops
 
   -6                         Perform last deco stop at 6m
 
@@ -50,7 +50,7 @@ Examples:
 
   ./opendeco -d 18 -t 60 -g Air
   ./opendeco -d 30 -t 60 -g EAN32
-  ./opendeco -d 40 -t 120 -g 21/35 -l 20 -h 80 --decogasses Oxygen,EAN50
+  ./opendeco -d 40 -t 120 -g 21/35 -L 20 -H 80 --decogasses Oxygen,EAN50
 
 Report bugs to <~tsegers/opendeco@lists.sr.ht> or
 https://todo.sr.ht/~tsegers/opendeco.
