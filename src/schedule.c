@@ -141,6 +141,10 @@ decoinfo_t calc_deco(decostate_t *ds, double start_depth, const gas_t *start_gas
     }
 
     double next_stop = abs_depth(ds->ceil_multiple * (ceil(gauge_depth(depth) / ds->ceil_multiple) - 1));
+
+    if (next_stop == depth)
+        next_stop -= ds->ceil_multiple;
+
     double current_gf = get_gf(ds, next_stop);
 
     for (;;) {
