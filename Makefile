@@ -5,8 +5,8 @@ CFLAGS = --std=c99 -pedantic -Wall -Werror -Os -DVERSION=${VERSION}
 
 all: opendeco opendeco_test libopendeco.a
 
-opendeco: src/opendeco.c src/deco.c src/deco.h src/schedule.c src/schedule.h src/output.c src/output.h
-	$(CC) $(CFLAGS) src/opendeco.c src/deco.c src/schedule.c src/output.c -lm -o opendeco
+opendeco: src/opendeco.c src/deco.c src/deco.h src/schedule.c src/schedule.h src/output.c src/output.h src/opendeco-cli.h src/opendeco-cli.c src/opendeco-conf.h
+	$(CC) $(CFLAGS) src/opendeco.c src/deco.c src/schedule.c src/output.c src/opendeco-cli.c -lm -o opendeco
 
 opendeco_test: test/opendeco_test.c test/deco_test.c src/deco.c 
 	$(CC) $(CFLAGS) test/minunit.c test/opendeco_test.c test/deco_test.c src/deco.c -lm -o opendeco_test
