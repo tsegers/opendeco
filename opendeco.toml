@@ -1,0 +1,15 @@
+[dive]
+gas                 = "Air"           # Bottom gas used during the dive
+surface_pressure    = 1.01325         # Surface air pressure [bar]
+rmv                 = 20              # RMV during the dive portion of the dive [l/min]
+
+[deco]
+gflow               = 30              # Gradient factor at the first stop
+gfhigh              = 75              # Gradient factor at the surface
+decogasses          = "EAN50,Oxygen"  # Gasses available for deco
+last_stop_at_six    = false           # Perform last deco stop at 6m
+switch_intermediate = true            # Switch gas at MOD instead of at deco stop
+rmv                 = 15              # Set the RMV during the deco portion of the dive [l/min]
+
+[conf]
+show_travel         = false           # Show travel segments in deco plan

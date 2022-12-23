@@ -138,13 +138,16 @@ int main(int argc, char *argv[])
     setlocale(LC_ALL, "en_US.utf8");
 
     /* argp */
+    char *gas_default = strdup("Air");
+    char *decogasses_default = strdup("");
+
     struct arguments arguments = {
         .depth = -1,
         .time = -1,
-        .gas = "Air",
+        .gas = gas_default,
         .gflow = 30,
         .gfhigh = 75,
-        .decogasses = "",
+        .decogasses = decogasses_default,
         .SURFACE_PRESSURE = SURFACE_PRESSURE_DEFAULT,
         .SWITCH_INTERMEDIATE = SWITCH_INTERMEDIATE_DEFAULT,
         .LAST_STOP_AT_SIX = LAST_STOP_AT_SIX_DEFAULT,
@@ -153,6 +156,7 @@ int main(int argc, char *argv[])
         .SHOW_TRAVEL = SHOW_TRAVEL_DEFAULT,
     };
 
+    opendeco_conf_parse("opendeco.toml", &arguments);
     opendeco_argp_parse(argc, argv, &arguments);
 
     /* apply global options */
@@ -213,6 +217,10 @@ int main(int argc, char *argv[])
     wprintf(L"\nNDL: %i TTS: %i TTS @+5: %i\n", (int) floor(di.ndl), (int) ceil(di.tts), (int) ceil(di_plus5.tts));
     print_planfoot(&ds);
 
+    /* cleanup */
     free(deco_gasses);
+    free(arguments.gas);
+    free(arguments.decogasses);
+
     return 0;
 }

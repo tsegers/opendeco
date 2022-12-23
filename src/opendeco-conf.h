@@ -21,4 +21,6 @@ struct arguments {
     int SHOW_TRAVEL;
 };
 
+int opendeco_conf_parse(const char *confpath, struct arguments *arguments);
+
 #endif /* end of include guard: OPENDECOCONF_H */

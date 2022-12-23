@@ -2,6 +2,7 @@
 
 #include <argp.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "opendeco-cli.h"
 
@@ -47,7 +48,10 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
         arguments->time = arg ? atof(arg) : -1;
         break;
     case 'g':
-        arguments->gas = arg;
+        if (arguments->gas)
+            free(arguments->gas);
+
+        arguments->gas = strdup(arg);
         break;
     case 'p':
         arguments->SURFACE_PRESSURE = arg ? atof(arg) : -1;
@@ -62,7 +66,10 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
         arguments->gfhigh = arg ? atoi(arg) : 100;
         break;
     case 'G':
-        arguments->decogasses = arg;
+        if (arguments->decogasses)
+            free(arguments->decogasses);
+
+        arguments->decogasses = strdup(arg);
         break;
     case 'S':
         arguments->SWITCH_INTERMEDIATE = 0;
