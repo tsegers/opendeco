@@ -60,10 +60,10 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
         arguments->RMV_DIVE = arg ? atof(arg) : -1;
         break;
     case 'L':
-        arguments->gflow = arg ? atoi(arg) : 100;
+        arguments->gflow = arg ? atoi(arg) : -1;
         break;
     case 'H':
-        arguments->gfhigh = arg ? atoi(arg) : 100;
+        arguments->gfhigh = arg ? atoi(arg) : -1;
         break;
     case 'G':
         if (arguments->decogasses)
@@ -91,6 +91,14 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
         }
         if (arguments->SURFACE_PRESSURE <= 0) {
             argp_failure(state, 1, 0, "Surface air pressure must be positive");
+            exit(ARGP_ERR_UNKNOWN);
+        }
+        if (arguments->gflow <= 0) {
+            argp_failure(state, 1, 0, "GF Low invalid");
+            exit(ARGP_ERR_UNKNOWN);
+        }
+        if (arguments->gfhigh <= 0) {
+            argp_failure(state, 1, 0, "GF High invalid");
             exit(ARGP_ERR_UNKNOWN);
         }
         if (arguments->gflow > arguments->gfhigh) {
