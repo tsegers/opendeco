@@ -147,11 +147,11 @@ decoinfo_t calc_deco(decostate_t *ds, double start_depth, const gas_t *start_gas
 
     double current_gf = get_gf(ds, next_stop);
 
-    for (;;) {
-        /* extra bookkeeping because waypoints and segments do not match 1:1 */
-        double last_waypoint_depth = depth;
-        double waypoint_time;
+    /* extra bookkeeping because waypoints and segments do not match 1:1 */
+    double last_waypoint_depth = depth;
+    double waypoint_time;
 
+    for (;;) {
         while (ceiling(ds, current_gf) < next_stop && !surfaced(depth)) {
             /* switch to better gas if available */
             const gas_t *best = best_gas(depth, deco_gasses, nof_gasses);
@@ -211,6 +211,8 @@ decoinfo_t calc_deco(decostate_t *ds, double start_depth, const gas_t *start_gas
 
         if (wp_cb && wp_cb->fn && waypoint_time)
             wp_cb->fn(ds, (waypoint_t){.depth = depth, .time = waypoint_time, .gas = gas}, segtype, wp_cb->arg);
+
+        last_waypoint_depth = depth;
 
         /* terminate if we surfaced */
         if (surfaced(depth))
