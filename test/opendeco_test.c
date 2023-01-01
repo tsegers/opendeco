@@ -1,4 +1,4 @@
-#include "minunit.h"
+#include "../minunit/minunit.h"
 
 MU_TEST_SUITE(testsuite_deco);
 

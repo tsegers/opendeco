@@ -5,7 +5,7 @@ packages:
 tasks:
   - check-format: |
       cd opendeco
-      clang-format-13 -n --Werror src/*.c src/*.h test/*.c test/*.h
+      clang-format-13 -n --Werror src/*.c src/*.h test/*.c
   - build: |
       cd opendeco
       make
