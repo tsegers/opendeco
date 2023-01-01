@@ -3,7 +3,7 @@
 #include <wchar.h>
 
 #include "opendeco-conf.h"
-#include "../toml/toml.h"
+#include "toml/toml.h"
 
 int opendeco_conf_parse(const char *confpath, struct arguments *arguments)
 {

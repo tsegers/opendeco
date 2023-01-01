@@ -1,7 +1,7 @@
 PREFIX = /usr/local
 
 VERSION = \"$(shell git describe --tags --dirty)\"
-CFLAGS = --std=c99 -pedantic -Wall -Werror -Os -D_DEFAULT_SOURCE -DVERSION=${VERSION}
+CFLAGS = --std=c99 -pedantic -Wall -Werror -Os -I. -D_DEFAULT_SOURCE -DVERSION=${VERSION}
 
 all: opendeco opendeco_test libopendeco.a
 
