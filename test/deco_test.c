@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: MIT-0 */
+
 #include "minunit/minunit.h"
 
 #include "src/deco.h"

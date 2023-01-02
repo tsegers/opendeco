@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: MIT-0 */
+
 #include "minunit/minunit.h"
 
 MU_TEST_SUITE(testsuite_deco);

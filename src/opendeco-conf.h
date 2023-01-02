@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: MIT-0 */
+
 #ifndef OPENDECOCONF_H
 #define OPENDECOCONF_H
 
