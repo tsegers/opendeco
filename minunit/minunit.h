@@ -201,6 +201,22 @@ extern void (*minunit_teardown)(void);
 	}\
 )
 
+#define mu_assert_double_near(expected, result, maxabserr) MU__SAFE_BLOCK(\
+	double minunit_tmp_e;\
+	double minunit_tmp_r;\
+	minunit_assert++;\
+	minunit_tmp_e = (expected);\
+	minunit_tmp_r = (result);\
+	if (fabs(minunit_tmp_e-minunit_tmp_r) > maxabserr) {\
+		int minunit_significant_figures = 1 - log10(maxabserr);\
+		snprintf(minunit_last_message, MINUNIT_MESSAGE_LEN, "%s failed:\n\t%s:%d: %.*g expected but was %.*g", __func__, __FILE__, __LINE__, minunit_significant_figures, minunit_tmp_e, minunit_significant_figures, minunit_tmp_r);\
+		minunit_status = 1;\
+		return;\
+	} else {\
+		printf(".");\
+	}\
+)
+
 #define mu_assert_string_eq(expected, result) MU__SAFE_BLOCK(\
 	const char* minunit_tmp_e = expected;\
 	const char* minunit_tmp_r = result;\

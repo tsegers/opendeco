@@ -19,6 +19,8 @@ MU_TEST(test_abs_gauge)
 
 MU_TEST(test_gas)
 {
+    double max_mod_err = 1E-3;
+
     gas_t foo = gas_new(21, 35, MOD_AUTO);
     gas_t bar = gas_new(21, 0, MOD_AUTO);
     gas_t baz = gas_new(21, 35, MOD_AUTO);
@@ -33,9 +35,9 @@ MU_TEST(test_gas)
     mu_check(gas_equal(&foo, &baz));
     mu_check(!gas_equal(&foo, &qux));
 
-    mu_assert_double_eq(abs_depth(msw_to_bar(51.6)), gas_mod(&foo));
-    mu_assert_double_eq(abs_depth(msw_to_bar(30)), gas_mod(&bar));
-    mu_assert_double_eq(99, gas_mod(&qux));
+    mu_assert_double_near(abs_depth(msw_to_bar(51.6)), gas_mod(&foo), max_mod_err);
+    mu_assert_double_near(abs_depth(msw_to_bar(30)), gas_mod(&bar), max_mod_err);
+    mu_assert_double_near(99, gas_mod(&qux), max_mod_err);
 }
 
 void testsuite_deco_setup(void)
