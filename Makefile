@@ -14,6 +14,8 @@ OBJ_BIN = src/opendeco.o src/opendeco-cli.o src/opendeco-conf.o src/deco.o src/o
 OBJ_LIB = src/deco.o src/output.o src/schedule.o
 OBJ_TST = test/opendeco_test.o test/deco_test.o src/deco.o minunit/minunit.o
 
+LICENSES = minunit/LICENSE.h toml/LICENSE.h
+
 DEPS = $(shell find -type f -name "*.dep")
 
 all: opendeco opendeco_test libopendeco.a
@@ -45,15 +47,21 @@ opendeco_test: $(OBJ_TST)
 libopendeco.a: $(OBJ_LIB)
 	@ar rs libopendeco.a $(OBJ_LIB)
 
-%.o: %.c
+%.o: %.c # override the built-in default recipe
+%.o: %.c $(LICENSES)
 	@echo "  CC      $@"
 	@mkdir -p .dep/$(dir $@)
 	@$(CC) $(CFLAGS) -MD -MF .dep/$@.dep -o $@ -c $<
+
+%LICENSE.h: %LICENSE
+	@echo "  XXD     $@"
+	@xxd -i $< > $@
 
 clean:
 	rm -f $(OBJ_BIN)
 	rm -f $(OBJ_LIB)
 	rm -f $(OBJ_TST)
+	rm -f $(LICENSES)
 	rm -f opendeco
 	rm -f opendeco_test
 	rm -f libopendeco.a

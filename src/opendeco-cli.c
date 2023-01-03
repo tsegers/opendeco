@@ -3,8 +3,21 @@
 #include <argp.h>
 #include <stdlib.h>
 #include <string.h>
+#include <wchar.h>
 
 #include "opendeco-cli.h"
+
+#include "toml/LICENSE.h"
+#include "minunit/LICENSE.h"
+
+#define print_xxd_arr(name, arrname)            \
+    do {                                        \
+        wprintf(L"--------\n\n");               \
+        wprintf(L"License for: %s\n\n", name);  \
+        for (int i = 0; i < arrname##_len; i++) \
+            putwchar(arrname[i]);               \
+        wprintf(L"\n");                         \
+    } while (0)
 
 static char args_doc[] = "";
 static char doc[] = "Implementation of Buhlmann ZH-L16 with Gradient Factors:"
@@ -33,8 +46,16 @@ static struct argp_option options[] = {
     {"showtravel", 'T', 0,        0,                   "Show travel segments in deco plan",                               11},
 
     {0,            0,   0,        0,                   "Informational options:",                                          0 },
+    {"licenses",   -1,  0,        0,                   "Show third-party licenses",                                       0 },
     {0,            0,   0,        0,                   0,                                                                 0 }
 };
+
+static void print_licenses()
+{
+    wprintf(L"THIRD-PARTY LICENSES:\n\n");
+    print_xxd_arr("cktan/tomlc99", toml_LICENSE);
+    print_xxd_arr("siu/minunit", minunit_LICENSE);
+}
 
 static error_t parse_opt(int key, char *arg, struct argp_state *state)
 {
@@ -83,6 +104,9 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
     case 'T':
         arguments->SHOW_TRAVEL = 1;
         break;
+    case -1:
+        print_licenses();
+        exit(ARGP_ERR_UNKNOWN);
     case ARGP_KEY_END:
         if (arguments->depth < 0 || arguments->time < 0) {
             argp_state_help(state, stderr, ARGP_HELP_USAGE);
